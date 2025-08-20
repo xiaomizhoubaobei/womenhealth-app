@@ -32,3 +32,6 @@ bin/
 gen/
 out/
 gradle.properties
+/export_git_changes.ps1
+/export_git_changes_advanced.ps1
+/导出Git变更.bat
