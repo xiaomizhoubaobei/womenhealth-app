@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.ksp)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -14,7 +15,7 @@ android {
         //noinspection OldTargetApi
         targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -93,4 +94,7 @@ dependencies {
     implementation(libs.gson)
     // 核心库脱糖
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+    // 谷歌Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
 }

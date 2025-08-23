@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import top.mizhoubaobei.womenhealth.data.AppDatabase
+import top.mizhoubaobei.womenhealth.data.SQLiteMenstrualStorage
 import top.mizhoubaobei.womenhealth.data.MenstrualRecord
 import java.util.Calendar
 import java.util.Date
@@ -16,8 +16,7 @@ import java.util.Date
  */
 class QuickAddViewModel(application: Application) : AndroidViewModel(application) {
     
-    private val database = AppDatabase.getDatabase(application)
-    private val menstrualDao = database.menstrualDao()
+    private val storage = SQLiteMenstrualStorage(application)
     
     private val _latestRecord = MutableLiveData<MenstrualRecord?>()
     val latestRecord: LiveData<MenstrualRecord?> = _latestRecord
@@ -38,7 +37,7 @@ class QuickAddViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                val record = menstrualDao.getLatestRecord()
+                val record = storage.getLatestRecord()
                 _latestRecord.value = record
                 
                 // 同时预测下次经期
@@ -57,7 +56,7 @@ class QuickAddViewModel(application: Application) : AndroidViewModel(application
     fun saveRecord(record: MenstrualRecord, onSuccess: () -> Unit) {
         viewModelScope.launch {
             try {
-                menstrualDao.insertRecord(record)
+                storage.insertRecord(record)
                 onSuccess()
             } catch (e: Exception) {
                 _errorMessage.value = "保存失败: ${e.message}"
@@ -71,7 +70,7 @@ class QuickAddViewModel(application: Application) : AndroidViewModel(application
     fun updateRecord(record: MenstrualRecord, onSuccess: () -> Unit) {
         viewModelScope.launch {
             try {
-                menstrualDao.updateRecord(record)
+                storage.updateRecord(record)
                 onSuccess()
             } catch (e: Exception) {
                 _errorMessage.value = "更新失败: ${e.message}"
@@ -85,7 +84,7 @@ class QuickAddViewModel(application: Application) : AndroidViewModel(application
     private fun predictNextPeriod() {
         viewModelScope.launch {
             try {
-                val recentRecords = menstrualDao.getRecentRecords(3)
+                val recentRecords = storage.getRecentRecords(3)
                 if (recentRecords.size >= 2) {
                     // 计算平均周期长度
                     var totalCycleDays = 0
@@ -126,7 +125,7 @@ class QuickAddViewModel(application: Application) : AndroidViewModel(application
     fun getCycleStats(callback: (CycleStats) -> Unit) {
         viewModelScope.launch {
             try {
-                val recentRecords = menstrualDao.getRecentRecords(6)
+                val recentRecords = storage.getRecentRecords(6)
                 val stats = calculateCycleStats(recentRecords)
                 callback(stats)
             } catch (e: Exception) {

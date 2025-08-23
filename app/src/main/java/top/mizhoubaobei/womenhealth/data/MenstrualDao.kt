@@ -29,6 +29,21 @@ interface MenstrualDao {
     @Query("SELECT * FROM menstrual_records ORDER BY startDate DESC LIMIT :limit")
     suspend fun getRecentRecords(limit: Int): List<MenstrualRecord>
     
+    @Query("SELECT * FROM menstrual_records ORDER BY startDate DESC LIMIT :pageSize OFFSET :offset")
+    suspend fun getRecordsByPage(offset: Int, pageSize: Int): List<MenstrualRecord>
+    
+    @Query("SELECT * FROM menstrual_records WHERE startDate < :beforeDate ORDER BY startDate DESC LIMIT :pageSize")
+    suspend fun getRecordsBeforeDate(beforeDate: Date, pageSize: Int): List<MenstrualRecord>
+    
+    @Query("SELECT * FROM menstrual_records WHERE startDate > :afterDate ORDER BY startDate ASC LIMIT :pageSize")
+    suspend fun getRecordsAfterDate(afterDate: Date, pageSize: Int): List<MenstrualRecord>
+    
+    @Query("SELECT COUNT(*) FROM menstrual_records WHERE startDate < :date")
+    suspend fun getRecordsCountBeforeDate(date: Date): Int
+    
+    @Query("SELECT COUNT(*) FROM menstrual_records WHERE startDate > :date")
+    suspend fun getRecordsCountAfterDate(date: Date): Int
+    
     @Insert
     suspend fun insertRecord(record: MenstrualRecord): Long
     

@@ -1,6 +1,7 @@
 [versions]
 agp = "8.10.1"
 credentials = "1.6.0-alpha03"
+firebaseBom = "34.1.0"
 gson = "2.11.0"
 kotlin = "2.0.21"
 ksp = "2.0.21-1.0.28"
@@ -18,10 +19,13 @@ navigationUiKtx = "2.9.1"
 playServicesSafetynet = "18.1.0"
 room = "2.7.1"
 desugar = "2.1.5"
+agcp = "1.5.2.300"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -38,9 +42,11 @@ androidx-room-runtime = { group = "androidx.room", name = "room-runtime", versio
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar" }
+agcp = { module = "com.huawei.agconnect:agcp", version.ref = "agcp" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+agcp = { id = "com.huawei.agconnect", version.ref = "agcp" }
 

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import top.mizhoubaobei.womenhealth.data.MenstrualRecord
 import top.mizhoubaobei.womenhealth.databinding.FragmentListBinding
 
@@ -39,8 +40,8 @@ class ListFragment : Fragment() {
         setupObservers()
         setupClickListeners()
         
-        // 加载数据
-        viewModel.loadAllRecords()
+        // 初始加载第一页数据
+        viewModel.loadRecords(0)
     }
     
     private fun setupRecyclerView() {
@@ -50,8 +51,9 @@ class ListFragment : Fragment() {
                 showEditDialog(record)
             },
             onDeleteClick = { record ->
-                // 删除记录
+                // 删除记录并刷新列表
                 viewModel.deleteRecord(record)
+                viewModel.loadRecords(0) // 删除后重新加载第一页
             }
         )
         
@@ -78,6 +80,20 @@ class ListFragment : Fragment() {
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         }
+        
+        // 添加分页加载监听
+        binding.recyclerViewRecords.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
+                val totalItemCount = layoutManager.itemCount
+                
+                if (!viewModel.isLoading.value!! && lastVisibleItem >= totalItemCount - 5) {
+                    viewModel.loadRecords(viewModel.currentPage.value!! + 1)
+                }
+            }
+        })
     }
     
     private fun setupClickListeners() {
@@ -89,7 +105,7 @@ class ListFragment : Fragment() {
     private fun showAddDialog() {
         val dialog = AddRecordDialog.newInstance()
         dialog.setOnRecordSavedListener { record ->
-            viewModel.loadAllRecords()
+            viewModel.loadRecords(0) // 添加记录后重新加载第一页
         }
         dialog.show(parentFragmentManager, "AddRecordDialog")
     }
@@ -97,7 +113,7 @@ class ListFragment : Fragment() {
     private fun showEditDialog(record: MenstrualRecord) {
         val dialog = AddRecordDialog.newInstance(record)
         dialog.setOnRecordSavedListener { updatedRecord ->
-            viewModel.loadAllRecords()
+            viewModel.loadRecords(0) // 添加记录后重新加载第一页
         }
         dialog.show(parentFragmentManager, "EditRecordDialog")
     }

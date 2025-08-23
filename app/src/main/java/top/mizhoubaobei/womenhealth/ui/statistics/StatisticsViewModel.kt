@@ -6,7 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import top.mizhoubaobei.womenhealth.data.AppDatabase
+import kotlinx.coroutines.flow.first
+import top.mizhoubaobei.womenhealth.data.SQLiteMenstrualStorage
 import top.mizhoubaobei.womenhealth.data.MenstrualRecord
 import top.mizhoubaobei.womenhealth.data.MenstrualSymptom
 import java.util.*
@@ -18,8 +19,7 @@ import kotlin.math.sqrt
  */
 class StatisticsViewModel(application: Application) : AndroidViewModel(application) {
     
-    private val database = AppDatabase.getDatabase(application)
-    private val menstrualDao = database.menstrualDao()
+    private val storage = SQLiteMenstrualStorage(application)
     
     private val _statistics = MutableLiveData<DetailedStatistics>()
     val statistics: LiveData<DetailedStatistics> = _statistics
@@ -36,17 +36,17 @@ class StatisticsViewModel(application: Application) : AndroidViewModel(applicati
     fun loadStatistics() {
         viewModelScope.launch {
             try {
-                _isLoading.value = true
-                _errorMessage.value = ""
+                _isLoading.postValue(true)
+                _errorMessage.postValue("")
                 
-                menstrualDao.getAllRecords().collect { records ->
-                    val stats = calculateDetailedStatistics(records)
-                    _statistics.value = stats
-                }
+                // 使用first()获取单次数据而不是Flow
+                val records = storage.getAllRecordsFlow().first()
+                val stats = calculateDetailedStatistics(records)
+                _statistics.postValue(stats)
             } catch (e: Exception) {
-                _errorMessage.value = "加载统计数据失败: ${e.message}"
+                _errorMessage.postValue("加载统计数据失败: ${e.message}")
             } finally {
-                _isLoading.value = false
+                _isLoading.postValue(false)
             }
         }
     }

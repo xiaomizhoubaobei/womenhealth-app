@@ -1,6 +1,8 @@
 package top.mizhoubaobei.womenhealth.data
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.io.Serializable
 import java.util.Date
@@ -8,12 +10,18 @@ import java.util.Date
 /**
  * 月经记录数据模型
  */
-@Entity(tableName = "menstrual_records")
+@Entity(tableName = "menstrual_records", indices = [
+    Index(value = ["startDate"], name = "idx_start_date"),
+    Index(value = ["endDate"], name = "idx_end_date"),
+    Index(value = ["createdAt"], name = "idx_created_at"),
+    Index(value = ["updatedAt"], name = "idx_updated_at")
+])
 data class MenstrualRecord(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     
     // 开始日期
+    @ColumnInfo(index = true)
     val startDate: Date,
     
     // 结束日期（可选）

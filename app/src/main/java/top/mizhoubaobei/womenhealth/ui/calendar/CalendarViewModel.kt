@@ -6,7 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import top.mizhoubaobei.womenhealth.data.AppDatabase
+import kotlinx.coroutines.flow.first
+import top.mizhoubaobei.womenhealth.data.SQLiteMenstrualStorage
 import top.mizhoubaobei.womenhealth.data.MenstrualRecord
 import java.util.Calendar
 import java.util.Date
@@ -16,8 +17,7 @@ import java.util.Date
  */
 class CalendarViewModel(application: Application) : AndroidViewModel(application) {
     
-    private val database = AppDatabase.getDatabase(application)
-    private val menstrualDao = database.menstrualDao()
+    private val storage = SQLiteMenstrualStorage(application)
     
     private val _monthlyRecords = MutableLiveData<List<MenstrualRecord>>()
     val monthlyRecords: LiveData<List<MenstrualRecord>> = _monthlyRecords
@@ -34,7 +34,7 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
     fun loadMonthlyRecords(year: Int, month: Int) {
         viewModelScope.launch {
             try {
-                _isLoading.value = true
+                _isLoading.postValue(true)
                 
                 // 计算月份的开始和结束时间戳
                 val calendar = Calendar.getInstance().apply {
@@ -46,13 +46,13 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
                 calendar.add(Calendar.MONTH, 1)
                 val endOfMonth = calendar.timeInMillis
                 
-                menstrualDao.getRecordsByMonth(startOfMonth, endOfMonth).collect { records ->
-                    _monthlyRecords.value = records
-                }
+                // 使用first()获取单次数据而不是Flow
+                val records = storage.getRecordsByMonth(startOfMonth, endOfMonth).first()
+                _monthlyRecords.postValue(records)
             } catch (e: Exception) {
-                _errorMessage.value = "加载数据失败: ${e.message}"
+                _errorMessage.postValue("加载数据失败: ${e.message}")
             } finally {
-                _isLoading.value = false
+                _isLoading.postValue(false)
             }
         }
     }
@@ -64,9 +64,9 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             try {
                 if (record.id == 0L) {
-                    menstrualDao.insertRecord(record)
+                    storage.insertRecord(record)
                 } else {
-                    menstrualDao.updateRecord(record.copy(updatedAt = Date()))
+                    storage.updateRecord(record.copy(updatedAt = Date()))
                 }
                 onSuccess()
             } catch (e: Exception) {
@@ -81,7 +81,7 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
     fun deleteRecord(record: MenstrualRecord, onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
             try {
-                menstrualDao.deleteRecord(record)
+                storage.deleteRecord(record)
                 onSuccess()
             } catch (e: Exception) {
                 onError("删除失败: ${e.message}")
@@ -106,10 +106,8 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
                 calendar.add(Calendar.DAY_OF_MONTH, 1)
                 val startOfNextDay = calendar.time
                 
-                val records = menstrualDao.getRecordsByDateRange(startOfDay, startOfNextDay)
-                records.collect { recordList ->
-                    callback(recordList.firstOrNull())
-                }
+                val records = storage.getRecordsByDateRange(startOfDay, startOfNextDay)
+                callback(records.firstOrNull())
             } catch (e: Exception) {
                 callback(null)
             }
@@ -122,7 +120,7 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
     fun predictNextPeriod(callback: (Date?) -> Unit) {
         viewModelScope.launch {
             try {
-                val recentRecords = menstrualDao.getRecentRecords(3)
+                val recentRecords = storage.getRecentRecords(3)
                 if (recentRecords.size >= 2) {
                     // 计算平均周期长度
                     var totalCycleDays = 0

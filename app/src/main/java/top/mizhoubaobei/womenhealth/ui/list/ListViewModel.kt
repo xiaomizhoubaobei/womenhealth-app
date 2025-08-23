@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import top.mizhoubaobei.womenhealth.data.AppDatabase
+import top.mizhoubaobei.womenhealth.data.SQLiteMenstrualStorage
 import top.mizhoubaobei.womenhealth.data.MenstrualRecord
 import java.util.Calendar
 import java.util.Date
@@ -16,8 +16,7 @@ import java.util.Date
  */
 class ListViewModel(application: Application) : AndroidViewModel(application) {
     
-    private val database = AppDatabase.getDatabase(application)
-    private val menstrualDao = database.menstrualDao()
+    private val storage = SQLiteMenstrualStorage(application)
     
     private val _allRecords = MutableLiveData<List<MenstrualRecord>>()
     val allRecords: LiveData<List<MenstrualRecord>> = _allRecords
@@ -28,24 +27,52 @@ class ListViewModel(application: Application) : AndroidViewModel(application) {
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String> = _errorMessage
     
+    private val _currentPage = MutableLiveData(0)
+    val currentPage: LiveData<Int> = _currentPage
+    
+    private val _totalPages = MutableLiveData(0)
+    val totalPages: LiveData<Int> = _totalPages
+    
     /**
-     * 加载所有记录
+     * 分页加载记录
      */
-    fun loadAllRecords() {
+    fun loadRecords(page: Int = 0, pageSize: Int = 20, lastRecordDate: Date? = null) {
+        if (isLoading.value == true) return
+        
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                menstrualDao.getAllRecords().collect { records ->
-                    _allRecords.value = records
+                val records = if (lastRecordDate == null) {
+                    storage.getRecordsByPage(page * pageSize, pageSize)
+                } else {
+                    storage.getRecordsBeforeDate(lastRecordDate, pageSize)
                 }
+                
+                // 如果是第一页则直接替换，否则追加记录
+                if (page == 0 || lastRecordDate == null) {
+                    _allRecords.value = records
+                } else {
+                    _allRecords.value = (_allRecords.value ?: emptyList()) + records
+                }
+                
+                _currentPage.value = page
+                
+                // 计算总页数
+                val totalCount = if (lastRecordDate == null) {
+                    storage.getRecordCount()
+                } else {
+                    storage.getRecordsCountBeforeDate(lastRecordDate)
+                }
+                _totalPages.value = (totalCount + pageSize - 1) / pageSize
             } catch (e: Exception) {
                 _errorMessage.value = "加载数据失败: ${e.message}"
             } finally {
-                _isLoading.value = false
+                _isLoading.postValue(false) // 使用postValue确保线程安全
             }
         }
     }
-    
+
+
     /**
      * 保存记录
      */
@@ -53,9 +80,9 @@ class ListViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 if (record.id == 0L) {
-                    menstrualDao.insertRecord(record)
+                    storage.insertRecord(record)
                 } else {
-                    menstrualDao.updateRecord(record.copy(updatedAt = Date()))
+                    storage.updateRecord(record.copy(updatedAt = Date()))
                 }
                 onSuccess()
             } catch (e: Exception) {
@@ -70,7 +97,7 @@ class ListViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteRecord(record: MenstrualRecord) {
         viewModelScope.launch {
             try {
-                menstrualDao.deleteRecord(record)
+                storage.deleteRecord(record)
             } catch (e: Exception) {
                 _errorMessage.value = "删除失败: ${e.message}"
             }
@@ -83,7 +110,7 @@ class ListViewModel(application: Application) : AndroidViewModel(application) {
     fun getStatistics(callback: (RecordStatistics) -> Unit) {
         viewModelScope.launch {
             try {
-                val recentRecords = menstrualDao.getRecentRecords(6)
+                val recentRecords = storage.getRecentRecords(6)
                 val statistics = calculateStatistics(recentRecords)
                 callback(statistics)
             } catch (e: Exception) {
@@ -93,59 +120,43 @@ class ListViewModel(application: Application) : AndroidViewModel(application) {
     }
     
     private fun calculateStatistics(records: List<MenstrualRecord>): RecordStatistics {
-        if (records.size < 2) {
-            return RecordStatistics(
-                totalRecords = records.size,
-                latestRecord = records.firstOrNull()
-            )
-        }
+        if (records.isEmpty()) return RecordStatistics()
         
-        // 计算平均周期长度
-        var totalCycleDays = 0
-        var cycleCount = 0
+        // 只保留必要的计算逻辑
+        val latest = records.firstOrNull()
         
-        for (i in 0 until records.size - 1) {
-            val current = records[i]
-            val previous = records[i + 1]
-            val daysBetween = ((current.startDate.time - previous.startDate.time) / (1000 * 60 * 60 * 24)).toInt()
-            if (daysBetween > 0 && daysBetween < 60) { // 合理的周期范围
-                totalCycleDays += daysBetween
-                cycleCount++
+        // 使用windowed计算周期，更简洁高效
+        val averageCycle = records.windowed(2)
+            .mapNotNull { (prev, curr) -> 
+                (curr.startDate.time - prev.startDate.time) / (1000 * 60 * 60 * 24) 
             }
-        }
-        
-        val averageCycle = if (cycleCount > 0) totalCycleDays / cycleCount else 0
-        
-        // 计算平均经期长度
-        var totalPeriodDays = 0
-        var periodCount = 0
-        
-        records.forEach { record ->
-            if (record.endDate != null) {
-                val periodLength = ((record.endDate.time - record.startDate.time) / (1000 * 60 * 60 * 24)).toInt() + 1
-                if (periodLength > 0 && periodLength < 15) { // 合理的经期长度
-                    totalPeriodDays += periodLength
-                    periodCount++
-                }
+            .takeIf { it.isNotEmpty() }
+            ?.average()
+            ?.toInt() ?: 0
+
+        // 使用filter和map计算经期长度
+        val averagePeriod = records
+            .filter { it.endDate != null }
+            .mapNotNull { 
+                ((it.endDate!!.time - it.startDate.time) / (1000 * 60 * 60 * 24) + 1).takeIf { len -> len in 1..14 }
             }
-        }
-        
-        val averagePeriod = if (periodCount > 0) totalPeriodDays / periodCount else 0
-        
+            .takeIf { it.isNotEmpty() }
+            ?.average()
+            ?.toInt() ?: 0
+
         // 预测下次经期
-        val nextPredicted = if (averageCycle > 0) {
-            val latestRecord = records.first()
-            val calendar = Calendar.getInstance()
-            calendar.time = latestRecord.startDate
-            calendar.add(Calendar.DAY_OF_MONTH, averageCycle)
-            calendar.time
+        val nextPredicted = if (averageCycle > 0 && latest != null) {
+            Calendar.getInstance().apply {
+                time = latest.startDate
+                add(Calendar.DAY_OF_MONTH, averageCycle)
+            }.time
         } else null
         
         return RecordStatistics(
             totalRecords = records.size,
             averageCycle = averageCycle,
             averagePeriod = averagePeriod,
-            latestRecord = records.firstOrNull(),
+            latestRecord = latest,
             nextPredicted = nextPredicted
         )
     }
