@@ -97,4 +97,14 @@ dependencies {
     // 谷歌Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+    implementation(libs.httpdns.sdk)
+    //华为AppGallery Connect
+    implementation(libs.agconnect.auth)
+    implementation(libs.agconnect.remoteconfig)
+    implementation(libs.agconnect.function)
+    implementation(libs.agconnect.database)
+    implementation(libs.agconnect.applinking)
+    implementation(libs.agconnect.crash)
+    implementation(libs.agconnect.appmessaging)
+    implementation (libs.alicloud.android.httpdns)
 }

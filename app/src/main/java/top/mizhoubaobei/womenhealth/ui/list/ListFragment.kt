@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import top.mizhoubaobei.womenhealth.data.MenstrualRecord
 import top.mizhoubaobei.womenhealth.databinding.FragmentListBinding
+import top.mizhoubaobei.womenhealth.ui.quickadd.QuickAddViewModel
 
 /**
  * 列表式月经记录界面
@@ -20,6 +21,7 @@ class ListFragment : Fragment() {
     private val binding get() = _binding!!
     
     private lateinit var viewModel: ListViewModel
+    private lateinit var quickAddViewModel: QuickAddViewModel
     private lateinit var recordsAdapter: RecordsAdapter
 
     override fun onCreateView(
@@ -35,6 +37,7 @@ class ListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         viewModel = ViewModelProvider(this)[ListViewModel::class.java]
+        quickAddViewModel = ViewModelProvider(requireActivity())[QuickAddViewModel::class.java]
         
         setupRecyclerView()
         setupObservers()
@@ -42,6 +45,11 @@ class ListFragment : Fragment() {
         
         // 初始加载第一页数据
         viewModel.loadRecords(0)
+        
+        // 监听快速添加页面的记录保存事件
+        quickAddViewModel.recordSavedEvent.observe(viewLifecycleOwner) {
+            viewModel.loadRecords(0) // 当快速添加页面保存记录后刷新列表
+        }
     }
     
     private fun setupRecyclerView() {

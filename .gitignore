@@ -11,27 +11,7 @@ local.properties
 # Keystore files
 *.jks
 *.keystore
-*.key
-app/release.keystore
 
-# Build
-build/
-app/build/
-app/release/
-
-# Logs
-*.log
-crash_*.log
-
-# Other
-*.apk
-*.ap_
-*.dex
-*.class
-bin/
-gen/
-out/
-gradle.properties
-/export_git_changes.ps1
-/export_git_changes_advanced.ps1
-/导出Git变更.bat
+# Script and config files
+*.ps1
+*.json
