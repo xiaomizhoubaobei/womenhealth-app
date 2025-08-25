@@ -106,5 +106,6 @@ dependencies {
     implementation(libs.agconnect.applinking)
     implementation(libs.agconnect.crash)
     implementation(libs.agconnect.appmessaging)
+    //阿里云HTTPDNS
     implementation (libs.alicloud.android.httpdns)
 }
