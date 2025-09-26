@@ -50,9 +50,9 @@ jobs:
       run: ./gradlew assembleRelease
       env:
         RELEASE_STORE_FILE: release.keystore
-        RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD || 'AZhou131499@a' }}
-        RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS || 'womenhealth' }}
-        RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD || 'AZhou131499@a' }}
+        RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+        RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+        RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
     
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
