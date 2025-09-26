@@ -228,7 +228,7 @@ class ReminderManager @Inject constructor(
 - 规律性评分雷达图
 
 #### 技术实现
-```kotlin
+```
 // 集成MPAndroidChart
 dependencies {
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
@@ -296,7 +296,7 @@ class BackupManager @Inject constructor(
 ### 7. 界面交互改进 ⭐⭐⭐
 
 #### 日历界面优化
-```kotlin
+```
 // 手势滑动切换月份
 class CalendarFragment : Fragment() {
     
@@ -335,7 +335,7 @@ class CalendarFragment : Fragment() {
 ### 8. 性能优化 ⭐⭐⭐
 
 #### 数据库查询优化
-```kotlin
+```
 // 优化分页查询
 @Dao
 interface MenstrualDao {
@@ -374,7 +374,7 @@ interface MenstrualDao {
 ### 9. 应用锁功能 ⭐⭐⭐⭐
 
 #### 生物识别认证
-```kotlin
+```
 // 生物识别管理器
 @Singleton
 class BiometricAuthManager @Inject constructor(
@@ -414,7 +414,7 @@ class BiometricAuthManager @Inject constructor(
 ### 10. 数据加密 ⭐⭐⭐
 
 #### 敏感数据加密
-```kotlin
+```
 // 数据加密工具
 @Singleton
 class EncryptionManager @Inject constructor() {
@@ -530,102 +530,51 @@ class HealthAnalyzer @Inject constructor(
 }
 ```
 
-### 13. 妊娠监测与备孕功能 ⭐⭐⭐⭐
+### 13. 营养健康管理系统 ⭐⭐⭐⭐
 
 #### 核心功能模块
-- 智能排卵期追踪系统
-- 个性化备孕建议引擎
-- 妊娠早期健康监测
-- 伴侣数据协同管理
+- 经期营养建议引擎
+- 个性化食谱推荐系统
+- 关键营养素追踪器
+- 健康应用数据联动
 
 #### 技术架构
-``kotlin
-// 妊娠监测管理器
-@Singleton
-class PregnancyMonitoringManager @Inject constructor(
-    private val repository: MenstrualRepository,
-    private val ovulationTracker: OvulationTracker,
-    private val nutritionAdvisor: NutritionAdvisor
-) {
-    
-    suspend fun startOvulationTracking(userId: String): TrackingResult {
-        return try {
-            // 初始化排卵追踪
-            val trackingSession = ovulationTracker.initializeTracking(userId)
-            
-            // 生成个性化建议
-            val recommendations = nutritionAdvisor.generatePreconceptionAdvice(userId)
-            
-            TrackingResult.Success(trackingSession, recommendations)
-        } catch (e: Exception) {
-            TrackingResult.Error(e.message ?: "排卵追踪启动失败")
-        }
-    }
-    
-    suspend fun monitorEarlyPregnancy(userId: String, lmp: Date): PregnancyStatus {
-        val edd = calculateEstimatedDueDate(lmp)
-        val currentWeek = calculateCurrentWeek(lmp)
-        
-        return PregnancyStatus(
-            estimatedDueDate = edd,
-            currentWeek = currentWeek,
-            pregnancyStage = determinePregnancyStage(currentWeek),
-            checkups = generateCheckupSchedule(edd)
-        )
-    }
-}
-```
-
-### 14. 营养健康管理系统 ⭐⭐⭐⭐
-
-#### 核心功能模块
-- 个性化营养建议引擎
-- 补血食谱推荐系统
-- 维生素摄入追踪
-- 健康数据整合分析
-
-#### 技术架构
-``kotlin
+```kotlin
 // 营养健康管理器
 @Singleton
 class NutritionHealthManager @Inject constructor(
     private val repository: MenstrualRepository,
     private val nutritionTracker: NutritionTracker,
-    private val recipeEngine: RecipeRecommendationEngine
+    private val recipeRecommender: RecipeRecommender
 ) {
     
-    suspend fun generateNutritionPlan(userId: String): NutritionPlan {
+    suspend fun generateCyclePhaseNutritionAdvice(userId: String): NutritionAdvice {
         return try {
-            // 获取用户健康数据
-            val userData = repository.getUserHealthData(userId)
+            // 获取用户周期阶段
+            val currentPhase = determineCurrentCyclePhase(userId)
             
-            // 分析当前周期阶段
-            val currentPhase = determineCurrentCyclePhase(userData)
-            
-            // 生成营养建议
-            val nutritionAdvice = nutritionTracker.generatePhaseBasedAdvice(userData, currentPhase)
+            // 生成阶段营养建议
+            val phaseAdvice = nutritionTracker.generatePhaseAdvice(currentPhase)
             
             // 推荐个性化食谱
-            val recipes = recipeEngine.recommendRecipes(userData)
+            val recipes = recipeRecommender.recommendRecipes(userId, currentPhase)
             
-            NutritionPlan(
-                cyclePhase = currentPhase,
-                nutritionAdvice = nutritionAdvice,
-                recommendedRecipes = recipes,
-                trackingTargets = generateTrackingTargets(userData)
-            )
+            NutritionAdvice.Success(phaseAdvice, recipes)
         } catch (e: Exception) {
-            throw NutritionPlanGenerationException("营养计划生成失败", e)
+            NutritionAdvice.Error(e.message ?: "营养建议生成失败")
         }
     }
     
-    suspend fun trackNutrientIntake(userId: String, intake: NutrientIntake): TrackingResult {
-        return try {
-            nutritionTracker.recordIntake(userId, intake)
-            TrackingResult.Success("营养摄入记录成功")
-        } catch (e: Exception) {
-            TrackingResult.Error(e.message ?: "营养摄入记录失败")
-        }
+    suspend fun assessAnemiaRisk(userId: String): AnemiaRiskAssessment {
+        val nutrientHistory = nutritionTracker.getNutrientHistory(userId, 90) // 90天数据
+        val healthIndicators = repository.getHealthIndicators(userId)
+        
+        return AnemiaRiskAssessment(
+            riskLevel = calculateAnemiaRisk(nutrientHistory, healthIndicators),
+            keyIndicators = identifyKeyIndicators(healthIndicators),
+            contributingFactors = analyzeContributingFactors(nutrientHistory),
+            personalizedRecommendations = generateDietaryRecommendations(nutrientHistory)
+        )
     }
 }
 ```
@@ -654,7 +603,7 @@ class NutritionHealthManager @Inject constructor(
 | 云端同步系统  | 开发团队 | 2026-07-01 | 2026-09-30 | 待开始 |
 | AI健康助手  | 开发团队 | 2026-08-01 | 2026-10-31 | 待开始 |
 | 妊娠监测与备孕功能 | 开发团队 | 2026-09-01 | 2026-12-31 | 待开始 |
-| 营养健康管理系统 | 开发团队 | 2026-10-01 | 2027-01-31 | 待开始 |
+| 营养健康管理系统 | 开发团队 | 2026-10-01 | 2026-12-31 | 待开始 |
 | 跨平台版本规划 | 开发团队 | 2026-09-01 | 2026-12-31 | 待开始 |
 
 ## 🎯 成功指标
