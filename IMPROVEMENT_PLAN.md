@@ -31,7 +31,7 @@
 - 关键UI流程测试覆盖率达到60%以上
 
 #### 实施计划
-```kotlin
+``kotlin
 // 单元测试示例
 class CalendarViewModelTest {
     @Test
@@ -73,7 +73,7 @@ class CalendarViewModelTest {
 - 减少组件间耦合
 
 #### 技术实施
-```kotlin
+``kotlin
 // 添加Hilt依赖
 dependencies {
     implementation "com.google.dagger:hilt-android:2.48"
@@ -121,7 +121,7 @@ class CalendarViewModel @Inject constructor(
 - 提高应用稳定性
 
 #### 实施方案
-```kotlin
+``kotlin
 // 统一错误处理
 sealed class Result<out T> {
     data class Success<T>(val data: T) : Result<T>()
@@ -184,7 +184,7 @@ class CalendarViewModel @Inject constructor(
 - 可自定义提醒时间和频率
 
 #### 技术实现
-```kotlin
+``kotlin
 // 提醒管理器
 @Singleton
 class ReminderManager @Inject constructor(
@@ -492,7 +492,7 @@ class CloudSyncService @Inject constructor(
 - 症状模式识别
 
 #### 实现框架
-```kotlin
+``kotlin
 // AI健康分析器
 @Singleton
 class HealthAnalyzer @Inject constructor(
@@ -539,7 +539,7 @@ class HealthAnalyzer @Inject constructor(
 - 健康应用数据联动
 
 #### 技术架构
-```kotlin
+```
 // 营养健康管理器
 @Singleton
 class NutritionHealthManager @Inject constructor(
@@ -579,6 +579,81 @@ class NutritionHealthManager @Inject constructor(
 }
 ```
 
+### 14. 医疗记录管理系统 ⭐⭐⭐⭐
+
+#### 核心功能模块
+- 妇科检查记录与提醒
+- 用药管理与副作用追踪
+- 医生预约集成服务
+- 健康数据报告自动生成
+
+#### 技术架构
+```
+// 医疗记录管理器
+@Singleton
+class MedicalRecordManager @Inject constructor(
+    private val checkupRepository: CheckupRepository,
+    private val medicationRepository: MedicationRepository,
+    private val appointmentRepository: AppointmentRepository,
+    private val reportGenerator: HealthReportGenerator
+) {
+    
+    suspend fun addGynecologicalCheckup(checkup: GynecologicalCheckup): Result<Long> {
+        return try {
+            val id = checkupRepository.insertCheckup(checkup)
+            // 设置下次检查提醒
+            scheduleNextCheckupReminder(checkup)
+            Result.Success(id)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+    
+    suspend fun addMedicationRecord(medication: MedicationRecord): Result<Long> {
+        return try {
+            val id = medicationRepository.insertMedication(medication)
+            // 设置用药提醒
+            scheduleMedicationReminders(medication)
+            Result.Success(id)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+    
+    suspend fun generateHealthReport(
+        userId: String,
+        reportType: ReportType,
+        period: ReportPeriod
+    ): Result<HealthReport> {
+        return try {
+            val report = reportGenerator.generateReport(userId, reportType, period)
+            // 保存报告
+            reportGenerator.saveReport(report)
+            Result.Success(report)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+    
+    private suspend fun scheduleNextCheckupReminder(checkup: GynecologicalCheckup) {
+        checkup.nextCheckupDate?.let { nextDate ->
+            val reminder = CheckupReminder(
+                userId = checkup.userId,
+                checkupType = checkup.checkupType,
+                scheduledDate = nextDate
+            )
+            // 调度提醒
+            // reminderService.scheduleCheckupReminder(reminder)
+        }
+    }
+    
+    private suspend fun scheduleMedicationReminders(medication: MedicationRecord) {
+        // 根据用药频率设置提醒
+        // reminderService.scheduleMedicationReminders(medication)
+    }
+}
+```
+
 ## 📊 实施时间表
 
 ### 第一阶段：基础优化（2026年1月-3月）
@@ -604,6 +679,7 @@ class NutritionHealthManager @Inject constructor(
 | AI健康助手  | 开发团队 | 2026-08-01 | 2026-10-31 | 待开始 |
 | 妊娠监测与备孕功能 | 开发团队 | 2026-09-01 | 2026-12-31 | 待开始 |
 | 营养健康管理系统 | 开发团队 | 2026-10-01 | 2026-12-31 | 待开始 |
+| 医疗记录管理系统 | 开发团队 | 2026-11-01 | 2027-02-28 | 待开始 |
 | 跨平台版本规划 | 开发团队 | 2026-09-01 | 2026-12-31 | 待开始 |
 
 ## 🎯 成功指标
