@@ -55,7 +55,7 @@ jobs:
         RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD || 'AZhou131499@a' }}
     
     - name: Upload APK artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: app-release
         path: app/build/outputs/apk/release/
