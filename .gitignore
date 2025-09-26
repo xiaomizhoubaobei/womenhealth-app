@@ -1,0 +1,17 @@
+# Android Studio
+*.iml
+.gradle
+.idea/
+local.properties
+.DS_Store
+/captures/
+.externalNativeBuild
+.cxx/
+
+# Keystore files
+*.jks
+
+# Script and config files
+*.ps1
+/导出Git变更.bat
+/gradle1.properties

@@ -1,0 +1,166 @@
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  sync-to-gitcode:
+    runs-on: ubuntu-latest
+    env:
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      GIT_USER: xiaomizhou
+      GIT_EMAIL: qixiaoxin@stu.sqxy.edu.cn
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up SSH Agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Accept Gitcode Host Key
+        run: |
+          echo -e "Host gitcode.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+          ssh-keyscan gitcode.com >> ~/.ssh/known_hosts
+
+      - name: Configure Git User
+        run: |
+          git config --global user.name "${{ secrets.GIT_USER }}"
+          git config --global user.email "${{ secrets.GIT_EMAIL }}"
+
+      - name: Add Gitcode Remote
+        run: git remote add gitcode git@gitcode.com:xiaomizhou/womenhealth-app.git
+
+      - name: Push to Gitcode
+        run: git push gitcode master
+
+  sync-to-gitee:
+    runs-on: ubuntu-latest
+    env:
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      GITEE_USER: ${{ secrets.GITEE_USER }}
+      GITEE_EMAIL: ${{ secrets.GITEE_EMAIL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up SSH Agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Accept Gitee Host Key
+        run: |
+          echo -e "Host gitee.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+          ssh-keyscan gitee.com >> ~/.ssh/known_hosts
+
+      - name: Configure Git User
+        run: |
+          git config --global user.name "${{ secrets.GITEE_USER }}"
+          git config --global user.email "${{ secrets.GITEE_EMAIL }}"
+
+      - name: Add Gitee Remote
+        run: git remote add gitee git@gitee.com:qinjielove/womenhealth-app.git
+
+      - name: Push to Gitee
+        run: git push gitee master
+
+  sync-to-codeup:
+    runs-on: ubuntu-latest
+    env:
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      GIT_USER: ${{ secrets.CODEUP_USER }}
+      GIT_EMAIL: ${{ secrets.CODEUP_EMAIL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up SSH Agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Accept Codeup Host Key
+        run: |
+          echo -e "Host codeup.aliyun.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+          ssh-keyscan codeup.aliyun.com >> ~/.ssh/known_hosts
+
+      - name: Configure Git User
+        run: |
+          git config --global user.name "${{ secrets.GIT_USER }}"
+          git config --global user.email "${{ secrets.GIT_EMAIL }}"
+
+      - name: Add Codeup Remote
+        run: git remote add codeup git@codeup.aliyun.com:686a57a36024b2147d89fbc0/womenhealthapp.git
+
+      - name: Push to Codeup
+        run: git push codeup master
+
+  sync-to-huaweicloud:
+    runs-on: ubuntu-latest
+    env:
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      GIT_USER: ${{ secrets.HUAWEICLOUD_USER }}
+      GIT_EMAIL: ${{ secrets.HUAWEICLOUD_EMAIL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up SSH Agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Accept HuaweiCloud Host Key
+        run: |
+          echo -e "Host codehub.devcloud.cn-north-4.huaweicloud.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+          ssh-keyscan codehub.devcloud.cn-north-4.huaweicloud.com >> ~/.ssh/known_hosts
+
+      - name: Configure Git User
+        run: |
+          git config --global user.name "${{ secrets.GIT_USER }}"
+          git config --global user.email "${{ secrets.GIT_EMAIL }}"
+
+      - name: Add HuaweiCloud Remote
+        run: git remote add huaweicloud git@codehub.devcloud.cn-north-4.huaweicloud.com:a95461d5a0a143a7b46d78c32e7f63b5/womenhealth-app.git
+
+      - name: Push to HuaweiCloud
+        run: git push huaweicloud master
+
+  sync-to-cnb:
+    runs-on: ubuntu-latest
+    env:
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      GIT_USER: ${{ secrets.CNB_USER }}
+      GIT_EMAIL: ${{ secrets.CNB_EMAIL }}
+      CNB_TOKEN: ${{ secrets.CNB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up SSH Agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Configure Git User
+        run: |
+          git config --global user.name "${{ secrets.GIT_USER }}"
+          git config --global user.email "${{ secrets.GIT_EMAIL }}"
+
+      - name: Add CNB Remote
+        run: git remote add cnb https://${{ secrets.CNB_TOKEN }}@cnb.cool/mizhoubaobei/womenhealth-app.git
+
+      - name: Push to CNB
+        run: git push cnb master

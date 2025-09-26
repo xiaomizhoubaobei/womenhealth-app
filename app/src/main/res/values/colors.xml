@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    <!-- 应用主题色 -->
+    <color name="primary_pink">#FFE91E63</color>
+    <color name="primary_pink_dark">#FFC2185B</color>
+    <color name="primary_pink_light">#FFF8BBD9</color>
+    
+    <!-- 经期相关颜色 -->
+    <color name="period_light">#FFFFE0E0</color>
+    <color name="period_normal">#FFFF9999</color>
+    <color name="period_heavy">#FFFF6666</color>
+    <color name="period_very_heavy">#FFFF3333</color>
+    
+    <!-- 预测和排卵期颜色 -->
+    <color name="predicted_period">#FFFFCCCB</color>
+    <color name="ovulation_day">#FF87CEEB</color>
+    
+    <!-- 今天的背景色 -->
+    <color name="today_background">#FF2196F3</color>
+    
+    <!-- 其他功能色 -->
+    <color name="success_green">#FF4CAF50</color>
+    <color name="warning_orange">#FFFF9800</color>
+    <color name="error_red">#FFF44336</color>
+    
+    <!-- 背景和文字颜色 -->
+    <color name="background_light">#FFFAFAFA</color>
+    <color name="surface_light">#FFFFFFFF</color>
+    <color name="surface_color">#FFFFFFFF</color>
+    <color name="text_primary">#FF212121</color>
+    <color name="primary_text">#FF212121</color>
+    <color name="text_secondary">#FF757575</color>
+    <color name="secondary_text">#FF757575</color>
+    
+    <!-- 缺失的颜色定义 -->
+    <color name="ovulation_light">#FFE3F2FD</color>
+    <color name="ovulation_color">#FF2196F3</color>
+    <color name="period_color">#FFE91E63</color>
+    <color name="divider_color">#FFBDBDBD</color>
+    <color name="symptom_indicator">#FFFF9800</color>
+    <color name="flow_normal">#FFFF9999</color>
+</resources>

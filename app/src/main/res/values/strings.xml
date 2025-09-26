@@ -1,0 +1,154 @@
+<resources>
+    <string name="app_name">LuminCore</string>
+    
+    <!-- 底部导航标题 -->
+    <string name="title_calendar">日历录入</string>
+    <string name="title_list">列表录入</string>
+    <string name="title_quick_add">快速添加</string>
+    <string name="title_statistics">统计分析</string>
+    
+    <!-- 月经记录相关 -->
+    <string name="menstrual_start_date">开始日期</string>
+    <string name="menstrual_end_date">结束日期</string>
+    <string name="menstrual_flow_level">流量等级</string>
+    <string name="menstrual_symptoms">症状</string>
+    <string name="menstrual_notes">备注</string>
+    <string name="cycle_length">周期长度</string>
+    <string name="period_length">经期长度</string>
+    
+    <!-- 流量等级 -->
+    <string name="flow_light">轻微</string>
+    <string name="flow_normal">正常</string>
+    <string name="flow_heavy">较多</string>
+    <string name="flow_very_heavy">很多</string>
+    
+    <!-- 症状 -->
+    <string name="symptom_cramps">痛经</string>
+    <string name="symptom_headache">头痛</string>
+    <string name="symptom_mood_swings">情绪波动</string>
+    <string name="symptom_bloating">腹胀</string>
+    <string name="symptom_breast_tenderness">乳房胀痛</string>
+    <string name="symptom_fatigue">疲劳</string>
+    <string name="symptom_nausea">恶心</string>
+    <string name="symptom_back_pain">腰痛</string>
+    <string name="symptom_acne">痤疮</string>
+    <string name="symptom_food_cravings">食欲变化</string>
+    
+    <!-- 按钮 -->
+    <string name="btn_save">保存</string>
+    <string name="btn_cancel">取消</string>
+    <string name="btn_delete">删除</string>
+    <string name="btn_edit">编辑</string>
+    <string name="btn_add">添加</string>
+    <string name="btn_today">今天</string>
+    <string name="btn_start_period">开始经期</string>
+    <string name="btn_end_period">结束经期</string>
+    
+    <!-- 提示信息 -->
+    <string name="msg_record_saved">记录已保存</string>
+    <string name="msg_record_deleted">记录已删除</string>
+    <string name="msg_select_date">请选择日期</string>
+    <string name="msg_no_records">暂无记录</string>
+    <string name="msg_confirm_delete">确认删除此记录？</string>
+    
+    <!-- 日历相关 -->
+    <string name="calendar_today">今天</string>
+    <string name="calendar_period_day">经期</string>
+    <string name="calendar_predicted_period">预测经期</string>
+    <string name="calendar_ovulation">排卵期</string>
+    
+    <!-- 统计相关 -->
+    <string name="stats_average_cycle">平均周期</string>
+    <string name="stats_average_period">平均经期</string>
+    <string name="stats_last_period">上次经期</string>
+    <string name="stats_next_predicted">下次预测</string>
+    <string name="stats_days">天</string>
+    
+    <!-- 对话框相关 -->
+    <string name="dialog_add_record">添加记录</string>
+    <string name="dialog_edit_record">编辑记录</string>
+    <string name="dialog_record_symptoms">记录症状</string>
+    <string name="dialog_select_start_date">选择开始日期</string>
+    <string name="dialog_select_end_date">选择结束日期</string>
+    <string name="dialog_set_end_date">设置结束日期</string>
+    
+    <!-- 快速操作 -->
+    <string name="quick_today">今天</string>
+    <string name="quick_yesterday">昨天</string>
+    <string name="quick_record_symptoms">记录症状</string>
+    <string name="quick_statistics">快速统计</string>
+    <string name="quick_clear_all">清除全部</string>
+    
+    <!-- 统计页面 -->
+    <string name="stats_basic_info">基本统计</string>
+    <string name="stats_period_info">经期信息</string>
+    <string name="stats_cycle_regularity">周期规律性</string>
+    <string name="stats_common_symptoms">常见症状</string>
+    <string name="stats_flow_distribution">流量分布</string>
+    <string name="stats_total_records">记录总数</string>
+    <string name="stats_variability_range">变化范围</string>
+    <string name="stats_no_data">暂无数据</string>
+    <string name="stats_no_statistics">暂无统计数据</string>
+    <string name="stats_add_more_records">添加更多记录后可查看详细统计</string>
+    
+    <!-- 日历相关 -->
+    <string name="calendar_previous_month">上个月</string>
+    <string name="calendar_next_month">下个月</string>
+    <string name="calendar_legend_period">经期</string>
+    <string name="calendar_legend_predicted">预测</string>
+    <string name="calendar_legend_ovulation">排卵期</string>
+    
+    <!-- 列表相关 -->
+    <string name="list_add_first_record">添加第一条记录</string>
+    <string name="list_days_ago_format">%d天前</string>
+    <string name="list_months_ago_format">%d个月前</string>
+    <string name="list_years_ago_format">%d年前</string>
+    <string name="list_today">今天</string>
+    <string name="list_yesterday">昨天</string>
+    <string name="list_flow_label">流量：</string>
+    <string name="list_symptoms_label">症状：</string>
+    <string name="list_notes_label">备注：</string>
+    <string name="list_period_to">至</string>
+    
+    <!-- 快速添加相关 -->
+    <string name="quick_add_title">快速记录</string>
+    <string name="quick_current_period">当前经期</string>
+    <string name="quick_last_period">上次经期</string>
+    <string name="quick_predicted_next">预测下次经期</string>
+    <string name="quick_click_to_record">点击快速记录</string>
+    <string name="quick_current_day_format">第%d天</string>
+    <string name="quick_started_on_format">开始于 %s</string>
+    <string name="quick_days_ago_format">%d天前</string>
+    <string name="quick_days_until_format">还有%d天</string>
+    <string name="quick_delayed_format">已延迟%d天</string>
+    
+    <!-- 症状对话框 -->
+    <string name="symptoms_dialog_title">记录症状</string>
+    <string name="symptoms_dialog_description">选择您当前的症状（可多选）</string>
+    
+    <!-- 提示和错误信息 -->
+    <string name="hint_add_notes">添加备注…</string>
+    <string name="error_select_end_date">请选择结束日期</string>
+    <string name="error_end_date_before_start">结束日期不能早于开始日期</string>
+    <string name="error_loading_failed">加载数据失败: %s</string>
+    <string name="error_save_failed">保存失败: %s</string>
+    <string name="error_delete_failed">删除失败: %s</string>
+    <string name="error_update_failed">更新失败: %s</string>
+    
+    <!-- 成功信息 -->
+    <string name="success_period_started">已记录经期开始</string>
+    <string name="success_period_ended">已记录经期结束</string>
+    <string name="success_symptoms_recorded">症状已记录</string>
+    
+    <!-- 规律性描述 -->
+    <string name="regularity_very_regular">非常规律</string>
+    <string name="regularity_quite_regular">比较规律</string>
+    <string name="regularity_somewhat_regular">一般规律</string>
+    <string name="regularity_irregular">不太规律</string>
+    
+    <!-- 时间格式 -->
+    <string name="format_days">%d天</string>
+    <string name="format_times">%d次</string>
+    <string name="format_percentage">%d%%</string>
+    <string name="todo">TODO</string>
+</resources>

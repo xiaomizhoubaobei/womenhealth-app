@@ -1,0 +1,62 @@
+[versions]
+agp = "8.10.1"
+alicloudAndroidHttpdnsVersion = "2.6.5"
+credentials = "1.6.0-alpha03"
+firebaseBom = "34.1.0"
+gson = "2.11.0"
+httpdnsSdk = "4.11.0"
+kotlin = "2.0.21"
+ksp = "2.0.21-1.0.28"
+coreKtx = "1.16.0"
+junit = "4.13.2"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+appcompat = "1.7.1"
+material = "1.12.0"
+constraintlayout = "2.2.1"
+lifecycleLivedataKtx = "2.9.1"
+lifecycleViewmodelKtx = "2.9.1"
+navigationFragmentKtx = "2.9.1"
+navigationUiKtx = "2.9.1"
+playServicesSafetynet = "18.1.0"
+room = "2.7.1"
+desugar = "2.1.5"
+agcVersion = "1.9.3.302"
+
+[libraries]
+alicloud-android-httpdns = { module = "com.aliyun.ams:alicloud-android-httpdns", version.ref = "alicloudAndroidHttpdnsVersion" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+httpdns-sdk = { module = "io.github.dnspod:httpdns-sdk", version.ref = "httpdnsSdk" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
+androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
+play-services-safetynet = { module = "com.google.android.gms:play-services-safetynet", version.ref = "playServicesSafetynet" }
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar" }
+agconnect-auth = { module = "com.huawei.agconnect:agconnect-auth", version.ref = "agcVersion" }
+agconnect-remoteconfig = {module = "com.huawei.agconnect:agconnect-remoteconfig", version.ref = "agcVersion"}
+agconnect-function = { module = "com.huawei.agconnect:agconnect-function", version.ref = "agcVersion" }
+agconnect-database = {module = "com.huawei.agconnect:agconnect-cloud-database", version.ref = "agcVersion"}
+agconnect-applinking = {module = "com.huawei.agconnect:agconnect-applinking", version.ref = "agcVersion"}
+agconnect-crash = { module = "com.huawei.agconnect:agconnect-crash", version.ref = "agcVersion" }
+agconnect-appmessaging = {module = "com.huawei.agconnect:agconnect-appmessaging", version.ref = "agcVersion"}
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+agcp = {id = "com.huawei.agconnect.agcp", version.ref = "agcVersion"}
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

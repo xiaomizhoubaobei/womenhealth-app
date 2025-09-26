@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_calendar">
+
+    <fragment
+        android:id="@+id/navigation_calendar"
+        android:name="top.mizhoubaobei.womenhealth.ui.calendar.CalendarFragment"
+        android:label="@string/title_calendar"
+        tools:layout="@layout/fragment_calendar" />
+
+    <fragment
+        android:id="@+id/navigation_list"
+        android:name="top.mizhoubaobei.womenhealth.ui.list.ListFragment"
+        android:label="@string/title_list"
+        tools:layout="@layout/fragment_list" />
+
+    <fragment
+        android:id="@+id/navigation_quick_add"
+        android:name="top.mizhoubaobei.womenhealth.ui.quickadd.QuickAddFragment"
+        android:label="@string/title_quick_add"
+        tools:layout="@layout/fragment_quick_add" />
+
+    <fragment
+        android:id="@+id/navigation_statistics"
+        android:name="top.mizhoubaobei.womenhealth.ui.statistics.StatisticsFragment"
+        android:label="@string/title_statistics"
+        tools:layout="@layout/fragment_statistics" />
+
+</navigation>
