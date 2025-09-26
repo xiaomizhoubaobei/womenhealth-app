@@ -19,7 +19,7 @@
 
 ### 2.1 整体架构
 
-``mermaid
+```mermaid
 graph TB
     subgraph "UI层 - 用户界面"
         A[AI Chat Interface]
@@ -61,7 +61,7 @@ graph TB
 
 ### 2.2 AI处理流程
 
-``mermaid
+```mermaid
 flowchart TD
     A[用户输入查询] --> B[自然语言预处理]
     B --> C[意图识别]

@@ -16,7 +16,7 @@
 
 ### 2.1 整体加密架构
 
-``mermaid
+```mermaid
 graph TB
     subgraph "数据加密系统架构"
         subgraph "应用层"
@@ -62,7 +62,7 @@ graph TB
 
 ### 2.2 数据加密流程
 
-``mermaid
+```mermaid
 flowchart TD
     A[用户数据输入] --> B[数据验证]
     B --> C[数据序列化]

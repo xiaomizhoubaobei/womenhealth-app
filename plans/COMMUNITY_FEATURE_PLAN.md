@@ -108,7 +108,7 @@ flowchart TD
 ## 3. 核心组件设计
 
 ### 3.1 社区管理器
-``kotlin
+```kotlin
 // CommunityManager.kt
 @Singleton
 class CommunityManager @Inject constructor(
@@ -176,7 +176,7 @@ class CommunityManager @Inject constructor(
 ```
 
 ### 3.2 社区服务层
-``kotlin
+```kotlin
 // CommunityService.kt
 @Singleton
 class CommunityService @Inject constructor(
@@ -232,7 +232,7 @@ interface CommunityProvider {
 ```
 
 ### 3.3 内容审核服务
-``kotlin
+```kotlin
 // ContentModerationService.kt
 @Singleton
 class ContentModerationService @Inject constructor(
@@ -300,7 +300,7 @@ enum class ModerationStatus {
 ```
 
 ### 3.4 专家咨询系统
-``kotlin
+```kotlin
 // ExpertConsultationService.kt
 @Singleton
 class ExpertConsultationService @Inject constructor(
@@ -368,7 +368,7 @@ sealed class ConsultationResult {
 ## 4. 数据模型设计
 
 ### 4.1 核心实体
-``kotlin
+```kotlin
 data class Topic(
     val id: String,
     val title: String,
@@ -424,7 +424,7 @@ enum class TopicCategory {
 ```
 
 ### 4.2 Room数据库实体
-``kotlin
+```kotlin
 @Entity(tableName = "community_posts")
 data class PostEntity(
     @PrimaryKey val id: String,
@@ -453,7 +453,7 @@ interface PostDao {
 ## 5. UI界面设计
 
 ### 5.1 社区首页
-``kotlin
+```kotlin
 // CommunityHomeFragment.kt
 class CommunityHomeFragment : Fragment() {
     
@@ -497,7 +497,7 @@ class CommunityHomeFragment : Fragment() {
 ```
 
 ### 5.2 发帖界面
-``kotlin
+```kotlin
 // CreatePostFragment.kt
 class CreatePostFragment : Fragment() {
     

@@ -21,7 +21,7 @@
 ### 1. 提醒类型定义
 
 #### 1.1 生理周期提醒
-``kotlin
+```kotlin
 enum class PartnerPeriodReminderType(
     val displayName: String,
     val defaultAdvanceDays: Int,
@@ -37,7 +37,7 @@ enum class PartnerPeriodReminderType(
 ```
 
 #### 1.2 健康关怀提醒
-``kotlin
+```kotlin
 enum class PartnerCareReminderType(
     val displayName: String,
     val frequency: ReminderFrequency,
@@ -52,7 +52,7 @@ enum class PartnerCareReminderType(
 ### 2. 分享机制设计
 
 #### 2.1 安全分享协议
-``kotlin
+```kotlin
 data class PartnerSharingConfig(
     val isEnabled: Boolean = false,
     val sharingMethod: SharingMethod,
@@ -85,7 +85,7 @@ data class VerificationRequest(
 
 ### 1. 核心组件架构
 
-``mermaid
+```mermaid
 graph TB
     subgraph "亲密伴侣提醒系统"
         subgraph "UI层"
@@ -145,7 +145,7 @@ graph TB
 
 ### 2. 伴侣提醒流程
 
-``mermaid
+```mermaid
 flowchart TD
     A[用户启用伴侣提醒] --> B[配置分享设置]
     B --> C[生成验证请求]
@@ -182,7 +182,7 @@ flowchart TD
 ```
 
 ### 3. 伴侣提醒管理器实现
-``kotlin
+```kotlin
 @Singleton
 class PartnerReminderManager @Inject constructor(
     private val context: Context,
@@ -296,7 +296,7 @@ class PartnerReminderManager @Inject constructor(
 ## 🗃️ 数据模型设计
 
 ### 1. 提醒实体
-``kotlin
+```kotlin
 @Entity(tableName = "partner_reminders")
 data class PartnerReminder(
     @PrimaryKey(autoGenerate = true)
@@ -424,7 +424,7 @@ enum class DeliveryStatus {
 - **访问日志**：记录所有数据访问和分享操作
 
 ### 2. 隐私保护措施
-``kotlin
+```kotlin
 @Singleton
 class PrivacyProtectionService @Inject constructor(
     private val encryptionService: EncryptionService,
@@ -464,6 +464,7 @@ class PrivacyProtectionService @Inject constructor(
         // 生成用于端到端加密的密钥
         val key = keyManager.generateRandomKey(32) // 256位密钥
         return Base64.encodeToString(key, Base64.DEFAULT)
+    }
     }
 
 /**
@@ -607,7 +608,7 @@ object AICareSuggestionEngine {
 ```
 
 ### 3. 验证与授权机制
-``kotlin
+```kotlin
 @Singleton
 class VerificationService @Inject constructor(
     private val encryptionService: EncryptionService
@@ -777,7 +778,7 @@ implementation "androidx.security:security-crypto-ktx:1.1.0-alpha06"
 ## 🧩 核心组件实现
 
 ### 1. 伴侣分享管理器
-``kotlin
+```kotlin
 @Singleton
 class PartnerSharingManager @Inject constructor(
     private val context: Context,
@@ -974,7 +975,7 @@ sealed class VerificationResult {
 ```
 
 ### 2. 伴侣提醒工作器实现
-``kotlin
+```kotlin
 class PartnerPeriodReminderWorker(
     context: Context,
     params: WorkerParameters
@@ -1134,7 +1135,7 @@ class PartnerPeriodReminderWorker(
 ```
 
 ### 3. 数据访问对象
-``kotlin
+```kotlin
 @Dao
 interface PartnerSharingConfigDao {
     
@@ -1158,7 +1159,7 @@ interface PartnerSharingConfigDao {
 ## 🔔 通知服务实现
 
 ### 1. 伴侣通知服务
-``kotlin
+```kotlin
 @Singleton
 class PartnerNotificationService @Inject constructor(
     private val context: Context,
@@ -1253,7 +1254,7 @@ class PartnerNotificationService @Inject constructor(
 ## 🎨 用户界面设计
 
 ### 1. 伴侣提醒设置界面
-``kotlin
+```kotlin
 @AndroidEntryPoint
 class PartnerReminderSettingsFragment : Fragment() {
     
@@ -1447,7 +1448,7 @@ class PartnerReminderSettingsFragment : Fragment() {
 ```
 
 ### 2. 伴侣验证界面
-``kotlin
+```kotlin
 @AndroidEntryPoint
 class PartnerVerificationActivity : AppCompatActivity() {
     
@@ -1520,7 +1521,7 @@ class PartnerVerificationActivity : AppCompatActivity() {
 ## 🧪 测试策略
 
 ### 1. 单元测试
-``kotlin
+```kotlin
 @ExperimentalCoroutinesApi
 class PartnerReminderManagerTest {
     

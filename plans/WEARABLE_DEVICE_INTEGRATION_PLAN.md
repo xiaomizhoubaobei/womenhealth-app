@@ -24,7 +24,7 @@
 
 ### 2.1 整体架构
 
-``mermaid
+```mermaid
 graph TB
     subgraph "可穿戴设备集成系统"
         subgraph "UI展示层"
@@ -77,7 +77,7 @@ graph TB
 
 ### 2.2 设备集成流程
 
-``mermaid
+```mermaid
 flowchart TD
     A[检测可用设备] --> B[用户选择设备]
     B --> C[设备配对连接]

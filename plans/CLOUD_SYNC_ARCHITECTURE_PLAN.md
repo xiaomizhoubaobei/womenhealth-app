@@ -21,7 +21,7 @@
 
 ### 2.1 整体架构图
 
-``mermaid
+```mermaid
 graph TB
     subgraph "客户端架构"
         A[UI层]
@@ -61,7 +61,7 @@ graph TB
 
 ### 2.2 数据同步流程
 
-``mermaid
+```mermaid
 flowchart TD
     A[启动同步] --> B[检查网络状态]
     B --> C{网络可用？}

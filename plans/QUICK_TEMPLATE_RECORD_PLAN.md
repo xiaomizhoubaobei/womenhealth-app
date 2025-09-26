@@ -132,7 +132,7 @@ flowchart TD
 ### 1. 数据模型设计
 
 #### 1.1 症状模板实体
-``kotlin
+```kotlin
 @Entity(tableName = "symptom_templates")
 data class SymptomTemplate(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
@@ -157,7 +157,7 @@ data class SymptomItem(
 ```
 
 #### 1.2 快速记录实体
-```
+````
 @Entity(tableName = "quick_records")
 data class QuickRecord(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
@@ -174,7 +174,7 @@ data class QuickRecord(
 ### 2. 核心服务实现
 
 #### 2.1 模板管理服务
-```
+```kotlin
 @Singleton
 class TemplateService @Inject constructor(
     private val templateRepository: TemplateRepository,
@@ -221,7 +221,7 @@ class TemplateService @Inject constructor(
 ```
 
 #### 2.2 智能推荐引擎
-```
+```kotlin
 @Singleton
 class TemplateRecommendationEngine @Inject constructor(
     private val recordRepository: MenstrualRecordRepository,
@@ -277,7 +277,7 @@ class TemplateRecommendationEngine @Inject constructor(
 ### 3. 用户界面核心
 
 #### 3.1 快速记录主界面
-```
+```kotlin
 @AndroidEntryPoint
 class QuickRecordFragment : Fragment() {
     
@@ -331,7 +331,7 @@ class QuickRecordFragment : Fragment() {
 ```
 
 #### 3.2 模板卡片组件
-```
+```kotlin
 class TemplateCardView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
