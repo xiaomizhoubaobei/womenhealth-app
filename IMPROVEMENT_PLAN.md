@@ -654,6 +654,76 @@ class MedicalRecordManager @Inject constructor(
 }
 ```
 
+### 15. 运动健康整合系统 ⭐⭐⭐⭐
+
+#### 核心功能模块
+- 基于月经周期的个性化运动建议
+- 经期痛经缓解瑜伽方案
+- 主流健身APP数据同步
+- 运动表现与周期关联分析
+
+#### 技术架构
+``kotlin
+// 运动健康管理器
+@Singleton
+class ExerciseHealthManager @Inject constructor(
+    private val exerciseAdvisor: CycleBasedExerciseAdvisor,
+    private val yogaPlanner: MenstrualReliefYogaPlanner,
+    private val fitnessSyncManager: FitnessDataSyncManager,
+    private val performanceAnalyzer: ExercisePerformanceAnalyzer
+) {
+    
+    suspend fun generateCycleBasedExerciseRecommendations(
+        userId: String,
+        currentCycleDay: Int
+    ): Result<List<CycleBasedExerciseRecommendation>> {
+        return try {
+            val userProfile = getUserProfile(userId)
+            val symptoms = getCurrentSymptoms(userId)
+            
+            val recommendations = exerciseAdvisor.generateExerciseRecommendations(
+                userProfile, currentCycleDay, symptoms
+            )
+            
+            Result.Success(recommendations)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+    
+    suspend fun generateMenstrualReliefYogaRoutine(
+        userId: String,
+        symptomSeverity: Map<SymptomType, SymptomSeverity>
+    ): Result<YogaRoutine> {
+        return try {
+            val userLevel = getUserYogaLevel(userId)
+            val routine = yogaPlanner.generateReliefRoutine(symptomSeverity, userLevel)
+            Result.Success(routine)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+    
+    suspend fun analyzeExercisePerformanceImpact(userId: String): Result<ExercisePerformanceAnalysis> {
+        return try {
+            val analysis = performanceAnalyzer.analyzeCyclePerformanceImpact(userId)
+            Result.Success(analysis)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+    
+    suspend fun syncFitnessData(userId: String): Result<SyncResult> {
+        return try {
+            val result = fitnessSyncManager.syncAllConnectedApps(userId)
+            Result.Success(result)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+}
+```
+
 ## 📊 实施时间表
 
 ### 第一阶段：基础优化（2026年1月-3月）
@@ -680,6 +750,7 @@ class MedicalRecordManager @Inject constructor(
 | 妊娠监测与备孕功能 | 开发团队 | 2026-09-01 | 2026-12-31 | 待开始 |
 | 营养健康管理系统 | 开发团队 | 2026-10-01 | 2026-12-31 | 待开始 |
 | 医疗记录管理系统 | 开发团队 | 2026-11-01 | 2027-02-28 | 待开始 |
+| 运动健康整合系统 | 开发团队 | 2027-01-01 | 2027-06-30 | 待开始 |
 | 跨平台版本规划 | 开发团队 | 2026-09-01 | 2026-12-31 | 待开始 |
 
 ## 🎯 成功指标
