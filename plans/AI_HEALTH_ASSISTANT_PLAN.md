@@ -1100,3 +1100,16 @@ class SmartDashboardFragment : Fragment() {
 - [数据加密功能](./DATA_ENCRYPTION_PLAN.md)
 - [云端同步架构](./CLOUD_SYNC_ARCHITECTURE_PLAN.md)
 - [可穿戴设备集成](./WEARABLE_DEVICE_INTEGRATION_PLAN.md)
+
+### 3.3 支持的AI模型API
+
+LuminCore AI健康助手支持多种云端AI模型API，用户可以根据需要选择使用：
+
+1. **文心一言（百度）** - 强大的中文自然语言处理能力
+2. **通义千问（阿里）** - 综合性大模型，适合多领域问答
+3. **DeepSeek** - 专业代码和逻辑推理能力
+4. **云雀大模型（字节）** - 高效的文本生成和理解能力
+5. **智谱AI** - 专业知识图谱和推理能力
+6. **Kimi（月之暗面）** - 长文本处理和复杂推理能力，特别适合生成详细的健康分析报告
+
+所有云端API调用都遵循严格的数据隐私保护原则，仅传输必要的匿名化特征数据，不包含任何个人身份信息。
