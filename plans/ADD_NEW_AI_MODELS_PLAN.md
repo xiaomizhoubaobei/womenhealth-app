@@ -28,7 +28,7 @@
 ## 3. 架构设计
 
 ### 3.1 整体架构更新
-``mermaid
+```mermaid
 graph TB
     subgraph "应用层"
         A[UI层] --> B[AI管理器]
