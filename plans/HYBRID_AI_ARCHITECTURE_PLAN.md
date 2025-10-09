@@ -13,7 +13,7 @@ LuminCore作为一款注重隐私保护的女性健康应用，采用纯本地�
 ### 2.1 总体架构
 采用混合架构，结合本地AI处理和云端API服务：
 
-``mermaid
+```mermaid
 graph TB
     subgraph "应用层"
         A[UI层] --> B[AI管理器]
