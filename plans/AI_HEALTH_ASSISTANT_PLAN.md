@@ -544,6 +544,7 @@ class SmartDashboardFragment : Fragment() {
 - [数据可视化计划](./DATA_VISUALIZATION_PLAN.md)
 - [数据备份同步计划](./DATA_BACKUP_SYNC_PLAN.md)
 - [数据加密计划](./DATA_ENCRYPTION_PLAN.md)
+- [新增AI分析模型计划](./ADD_NEW_AI_MODELS_PLAN.md)
 
 ## 📋 文档信息
 

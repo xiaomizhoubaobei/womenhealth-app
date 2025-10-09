@@ -36,17 +36,20 @@ graph TB
         D --> J[云雀大模型API]
         D --> K[智谱AI API]
         D --> L[KIMI API]
+        D --> M[Qwen增强版API]
+        D --> N[InternLM API]
+        D --> O[GPT API]
     end
     
     subgraph "数据保护层"
-        M[数据匿名化]
-        N[端到端加密]
-        O[用户授权管理]
+        P[数据匿名化]
+        Q[端到端加密]
+        R[用户授权管理]
     end
     
-    B --> M
-    B --> N
-    B --> O
+    B --> P
+    B --> Q
+    B --> R
 ```
 
 ### 2.2 核心组件
@@ -159,6 +162,36 @@ class KimiAPI {
     suspend fun longContextAnalysis(healthData: HealthDataSummary): String {
         // 调用KIMI API进行长文本健康数据分析
         // KIMI擅长处理长文本，适合复杂健康报告生成
+    }
+}
+```
+
+### 4.7 通义千问增强版（阿里）
+```kotlin
+class QwenEnhancedAPI {
+    suspend fun advancedHealthAnalysis(healthData: HealthDataSummary): String {
+        // 调用通义千问增强版API进行高级健康数据分析
+        // 提供更深入的健康洞察和建议
+    }
+}
+```
+
+### 4.8 InternLM（上海AI实验室）
+```kotlin
+class InternAPI {
+    suspend fun symptomPatternAnalysis(symptoms: List<String>): SymptomInsight {
+        // 调用Intern模型进行症状模式分析
+        // 利用InternLM在医学领域的专业知识
+    }
+}
+```
+
+### 4.9 GPT模型（OpenAI）
+```kotlin
+class GPTAPI {
+    suspend fun comprehensiveHealthAnalysis(healthData: HealthDataSummary): String {
+        // 调用GPT API进行综合健康分析
+        // 利用GPT在多语言和复杂推理方面的优势
     }
 }
 ```

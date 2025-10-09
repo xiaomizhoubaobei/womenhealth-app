@@ -902,6 +902,119 @@ class TravelHealthAssistantManager @Inject constructor(
 }
 ```
 
+### 18. AI模型扩展 ⭐⭐⭐⭐⭐
+
+#### 核心功能模块
+- Qwen模型集成（阿里巴巴通义千问）
+- Intern模型集成（上海AI实验室InternLM）
+- GPT模型集成（OpenAI GPT系列）
+- AI模型选择与切换功能
+- 多模型结果对比分析
+- 智能模型推荐系统
+
+#### 技术架构
+``kotlin
+// AI模型管理器
+@Singleton
+class AIModelManager @Inject constructor(
+    private val qwenAPI: QwenAPI,
+    private val internAPI: InternAPI,
+    private val gptAPI: GPTAPI,
+    private val userModelPreferences: UserModelPreferences
+) {
+    
+    suspend fun analyzeWithPreferredModel(
+        healthData: HealthData,
+        preferredModel: AIModelType? = null
+    ): Result<AIAnalysisResult> {
+        return try {
+            val modelToUse = preferredModel ?: userModelPreferences.getPreferredAIModel()
+            
+            val result = when (modelToUse) {
+                AIModelType.QWEN -> qwenAPI.analyzeHealthData(healthData)
+                AIModelType.INTERN -> internAPI.analyzeHealthData(healthData)
+                AIModelType.GPT -> gptAPI.analyzeHealthData(healthData)
+                else -> throw IllegalArgumentException("Unsupported AI model type")
+            }
+            
+            Result.Success(result)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+    
+    suspend fun compareModelResults(
+        healthData: HealthData,
+        models: List<AIModelType> = listOf(AIModelType.QWEN, AIModelType.INTERN, AIModelType.GPT)
+    ): Result<ModelComparisonResult> {
+        return try {
+            val results = mutableMapOf<AIModelType, AIAnalysisResult>()
+            
+            for (model in models) {
+                val result = when (model) {
+                    AIModelType.QWEN -> qwenAPI.analyzeHealthData(healthData)
+                    AIModelType.INTERN -> internAPI.analyzeHealthData(healthData)
+                    AIModelType.GPT -> gptAPI.analyzeHealthData(healthData)
+                }
+                results[model] = result
+            }
+            
+            val comparisonResult = ModelComparisonResult(
+                healthData = healthData,
+                modelResults = results,
+                generatedDate = Date()
+            )
+            
+            Result.Success(comparisonResult)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+    
+    suspend fun recommendOptimalModel(
+        userId: String,
+        healthData: HealthData
+    ): Result<AIModelType> {
+        return try {
+            // 基于用户历史使用情况和分析需求推荐最优模型
+            val recommendation = userModelPreferences.getOptimalModelRecommendation(
+                userId, 
+                healthData
+            )
+            Result.Success(recommendation)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+}
+
+// AI模型类型枚举
+enum class AIModelType {
+    QWEN,       // 阿里巴巴通义千问
+    INTERN,     // 上海AI实验室InternLM
+    GPT         // OpenAI GPT系列
+}
+
+// 模型比较结果
+data class ModelComparisonResult(
+    val healthData: HealthData,
+    val modelResults: Map<AIModelType, AIAnalysisResult>,
+    val generatedDate: Date
+)
+```
+
+#### 用户界面设计
+- AI模型选择下拉菜单
+- 模型性能对比图表
+- 智能推荐提示
+- 多模型结果展示界面
+
+#### 安全与隐私
+- 所有模型调用均使用匿名化数据
+- 端到端加密传输
+- 用户明确授权机制
+- 模型调用频率限制
+
 ## 📊 实施时间表
 
 ### 第一阶段：基础优化（2026年1月-3月）
@@ -925,6 +1038,7 @@ class TravelHealthAssistantManager @Inject constructor(
 |---------|------|------------|------------|-----|
 | 云端同步系统  | 开发团队 | 2026-07-01 | 2026-09-30 | 待开始 |
 | AI健康助手  | 开发团队 | 2026-08-01 | 2026-10-31 | 待开始 |
+| AI模型扩展  | 开发团队 | 2026-08-15 | 2026-11-15 | 待开始 |
 | 妊娠监测与备孕功能 | 开发团队 | 2026-09-01 | 2026-12-31 | 待开始 |
 | 营养健康管理系统 | 开发团队 | 2026-10-01 | 2026-12-31 | 待开始 |
 | 医疗记录管理系统 | 开发团队 | 2026-11-01 | 2027-02-28 | 待开始 |
@@ -962,6 +1076,7 @@ class TravelHealthAssistantManager @Inject constructor(
 | 依赖注入重构复杂度高 | 中   | 高  | 分阶段渐进式重构，保持向后兼容 |
 | 云端同步数据安全问题 | 低   | 极高 | 端到端加密，安全审计，隐私设计 |
 | AI算法准确性不足  | 中   | 中  | 大量数据训练，用户反馈优化   |
+| AI模型API成本控制 | 中   | 高  | 智能调用策略，用量监控      |
 | 性能优化效果有限   | 低   | 中  | 基准测试，渐进式优化      |
 
 ### 项目风险
@@ -970,6 +1085,7 @@ class TravelHealthAssistantManager @Inject constructor(
 | 开发进度延期 | 中   | 高  | 敏捷开发，定期review，弹性计划 |
 | 用户需求变化 | 高   | 中  | 用户调研，快速原型，迭代开发     |
 | 竞品功能超越 | 中   | 中  | 差异化定位，核心优势强化       |
+| 第三方API稳定性 | 中   | 高  | 多模型备份，降级机制，错误处理   |
 
 ## 📚 参考资源
 
