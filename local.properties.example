@@ -1,0 +1,17 @@
+# Android Local Properties Template
+# Copy this file to local.properties and fill in your actual values
+# This file is ignored by git to protect sensitive information
+
+# Path to your Android SDK
+# sdk.dir=/Users/username/Library/Android/sdk
+# sdk.dir=C:\\Users\\Username\\AppData\\Local\\Android\\Sdk
+# sdk.dir=/home/username/Android/Sdk
+
+sdk.dir=/path/to/your/android/sdk
+
+# Keystore configuration for signing (optional - can also use environment variables)
+# These can be overridden by environment variables or gradle.properties
+# KEYSTORE_FILE=your-keystore.jks
+# KEYSTORE_PASSWORD=your_keystore_password
+# KEY_ALIAS=your_key_alias
+# KEY_PASSWORD=your_key_password
