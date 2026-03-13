@@ -1,0 +1,164 @@
+# ==========================================
+# CNB 构建配置文件
+# 项目：女性健康 App (womenhealth-app-demo)
+# ==========================================
+
+# ==========================================
+# 第一部分：全局环境变量定义
+# ==========================================
+
+env:
+  # Gradle 配置
+  GRADLE_OPTS: '-Dorg.gradle.daemon=false'
+  
+  # Android 签名配置（敏感信息通过密钥仓库注入）
+  RELEASE_STORE_FILE: release.keystore
+  RELEASE_KEY_ALIAS: LuminCore
+  RELEASE_KEY_DNAME: 'CN=祁筱欣, L=徐汇区, ST=上海市, C=CN'
+  # RELEASE_STORE_PASSWORD 和 RELEASE_KEY_PASSWORD 由密钥仓库提供
+
+# ==========================================
+# 第二部分：锚点定义（可复用配置块）
+# ==========================================
+
+# Docker 构建配置锚点
+.docker_build_template: &docker_build_template
+  image: docker.cnb.cool/xmzzuzhi/cnb-docker/android:0.0.1
+  volumes:
+    - /root/.gradle/caches
+    - /root/.gradle/wrapper
+
+# Android 构建阶段锚点
+.android_build_stages: &android_build_stages
+  - name: Make gradlew executable
+    script: chmod +x ./gradlew
+
+  - name: Build APK
+    # 注意：RELEASE_STORE_PASSWORD 和 RELEASE_KEY_PASSWORD 由密钥仓库导入自动注入
+    # 密钥仓库导入的变量会直接成为环境变量，无需在此重新声明
+    # 全局 env 已配置 RELEASE_STORE_FILE 和 RELEASE_KEY_ALIAS
+    script: ./gradlew assembleRelease
+
+  - name: Get version info
+    script: |
+      VERSION_CODE=$(grep "versionCode" app/build.gradle.kts | head -1 | awk -F '= ' '{print $2}' | tr -d ' ')
+      VERSION_NAME=$(grep "versionName" app/build.gradle.kts | head -1 | awk -F '= "' '{print $2}' | tr -d '"')
+      echo "##[set-output VERSION_CODE=$VERSION_CODE]"
+      echo "##[set-output VERSION_NAME=$VERSION_NAME]"
+    exports:
+      VERSION_CODE: VERSION_CODE
+      VERSION_NAME: VERSION_NAME
+
+  - name: Upload APK artifact
+    image: cnbcool/attachments:latest
+    settings:
+      attachments:
+        - app/build/outputs/apk/release/app-release.apk
+
+# ==========================================
+# 第三部分：构建工作流定义
+# ==========================================
+
+# ------------------------------------------
+# 生产构建流程 (master 分支)
+# ------------------------------------------
+master:
+  push:
+    - name: push-build
+      # 从密钥仓库导入敏感配置（仅在 master 分支构建时导入）
+      imports:
+        - https://cnb.cool/XMZZUZHI/key/-/blob/main/Android.yml
+      ifModify:
+        # 触发构建的文件路径
+        - 'app/src/**'
+        - 'app/build.gradle*'
+        - 'gradle.properties'
+        - 'gradle/**'
+      docker:
+        build: *docker_build_template
+      stages: *android_build_stages
+
+# ==========================================
+# 第四部分：开发环境配置
+# ==========================================
+
+# ------------------------------------------
+# VSCode 开发环境 (包含 AI 工具链)
+# ------------------------------------------
+vscode:
+  - docker:
+      image: docker.cnb.cool/xmzzuzhi/cnb-docker/android:0.0.1
+      imports:
+        - https://cnb.cool/XMZZUZHI/key/-/blob/main/Claude.yml
+      runner:
+        cpus: 32
+      services:
+        - vscode
+        - docker
+      stages:
+        # --- 权限设置 ---
+        - name: 授予脚本执行权限
+          script: chmod +x /workspace/install_gpg_keys.sh
+
+        # --- AI 编码工具安装 ---
+        - name: 安装 iflow CLI
+          script: |
+            npm i -g @iflow-ai/iflow-cli@latest --verbose
+            echo "iflow CLI 安装完成"
+
+        - name: 安装 Claude CLI
+          script: |
+            npm install -g @anthropic-ai/claude-code --verbose
+            echo "Claude CLI 安装完成"
+
+        - name: 安装 OpenCode
+          script: |
+            npm install -g opencode-ai --verbose
+            echo "OpenCode 安装完成"
+            mkdir -p /root/.config/opencode/
+            curl -o /root/.config/opencode/opencode.json https://cnb-1329111128.cos.ap-guangzhou.myqcloud.com/opencode.json
+
+        - name: 安装 Qwen CLI
+          script: |
+            npm install -g @qwen-code/qwen-code@latest --verbose
+            echo "Qwen CLI 安装完成"
+
+        - name: 安装 CodeBuddy CLI
+          script: |
+            npm install -g @tencent-ai/codebuddy-code --verbose
+            echo "CodeBuddy CLI 安装完成"
+
+        - name: 安装 KIMI Code
+          script: |
+            curl -LsSf https://code.kimi.com/install.sh | bash
+            echo "KIMI Code 安装完成"
+
+        - name: 安装 Qoder CLI
+          script: |
+            curl -fsSL https://qoder.com/install | bash
+            echo "Qoder CLI 安装完成"
+
+        # --- 配置文件 ---
+        - name: 下载 iflow 配置
+          script: |
+            mkdir -p /root/.iflow
+            curl -o /root/.iflow/settings.json https://cnb-1329111128.cos.ap-guangzhou.myqcloud.com/1.json
+            echo "已下载并替换 /root/.iflow/settings.json"
+
+        # --- 系统依赖 ---
+        - name: 安装系统依赖
+          script: |
+            sudo apt-get update
+            sudo apt-get install -y lsof net-tools jq git-lfs
+            git lfs install
+            echo "系统依赖安装完成"
+
+        # --- 智能体安装 ---
+        - name: 安装 iflow 智能体
+          script: |
+            chmod +x /workspace/install_agents.sh
+            /workspace/install_agents.sh
+
+# ==========================================
+# 配置文件结束
+# ==========================================

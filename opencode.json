@@ -1,0 +1,27 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "cnb-assistant",
+  "instructions": [
+    ".opencode/instructions/cnb-openapi.md"
+  ],
+  "permission": {
+    "skill": {
+      "*": "allow"
+    }
+  },
+  "provider": {
+    "cnb": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "CNB AI",
+      "options": {
+        "apiKey": "{env:CNB_TOKEN}",
+        "baseURL": "{env:CNB_AI_BASE_URL}"
+      },
+      "models": {
+        "cnb-claude": {
+          "name": "{env:CNB_AI_MODAL}"
+        }
+      }
+    }
+  }
+}
