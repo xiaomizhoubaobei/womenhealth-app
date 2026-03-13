@@ -1,0 +1,90 @@
+[versions]
+agp = "8.10.1"
+alicloudAndroidHttpdnsVersion = "2.6.5"
+androidxActivityKtx = "1.9.0"
+androidxCoreKtx = "1.13.1"
+androidxAppcompat = "1.7.1"
+cardview = "1.0.0"
+constraintlayoutVersion = "2.2.1"
+coreKtxVersion = "1.13.1"
+credentials = "1.6.0-alpha03"
+firebaseBom = "34.1.0"
+gson = "2.11.0"
+httpdnsSdk = "4.11.0"
+kotlin = "2.0.21"
+kotlinxCoroutinesAndroidVersion = "1.10.2"
+ksp = "2.0.21-1.0.28"
+coreKtx = "1.16.0"
+junit = "4.13.2"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+appcompat = "1.7.1"
+lifecycleLivedataKtxVersion = "2.8.2"
+lifecycleLivedataKtx = "2.8.2"
+lifecycleViewmodelKtx = "2.8.2"
+navigationFragmentKtxVersion = "2.8.2"
+navigationUiKtxVersion = "2.8.2"
+playServicesSafetynet = "18.1.0"
+recyclerviewVersion = "1.3.2"
+room = "2.7.1"
+roomCompilerVersion = "2.7.1"
+roomVersion = "2.7.1"
+threetenabpVersion = "1.4.9"
+material = "1.12.0"
+mpandroidchartVersion = "3.1.0"
+desugar = "2.1.4"
+agcVersion = "1.9.1.301"
+
+[libraries]
+alicloud-android-httpdns = { module = "com.aliyun.ams:alicloud-android-httpdns", version.ref = "alicloudAndroidHttpdnsVersion" }
+androidx-activity-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "androidxActivityKtx" }
+androidx-constraintlayout-v214 = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayoutVersion" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-ktx-v1170 = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }
+androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+androidx-lifecycle-livedata-ktx-v2100 = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtxVersion" }
+androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleLivedataKtxVersion" }
+androidx-navigation-ui-ktx-v282 = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationUiKtxVersion" }
+androidx-navigation-fragment-ktx-v282 = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigationFragmentKtxVersion" }
+androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerviewVersion" }
+androidx-room-compiler-v261 = { module = "androidx.room:room-compiler", version.ref = "roomCompilerVersion" }
+androidx-room-ktx-v261 = { module = "androidx.room:room-ktx", version.ref = "roomVersion" }
+appcompat-v170 = { module = "androidx.appcompat:appcompat", version.ref = "androidxAppcompat" }
+cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
+core-ktx-v1131 = { module = "androidx.core:core-ktx", version.ref = "androidxCoreKtx" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+httpdns-sdk = { module = "io.github.dnspod:httpdns-sdk", version.ref = "httpdnsSdk" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroidVersion" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayoutVersion" }
+androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtxVersion" }
+androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtxVersion" }
+mpandroidchart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mpandroidchartVersion" }
+play-services-safetynet = { module = "com.google.android.gms:play-services-safetynet", version.ref = "playServicesSafetynet" }
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar" }
+agconnect-auth = { module = "com.huawei.agconnect:agconnect-auth", version.ref = "agcVersion" }
+agconnect-remoteconfig = {module = "com.huawei.agconnect:agconnect-remoteconfig", version.ref = "agcVersion"}
+agconnect-function = { module = "com.huawei.agconnect:agconnect-function", version.ref = "agcVersion" }
+agconnect-database = {module = "com.huawei.agconnect:agconnect-cloud-database", version.ref = "agcVersion"}
+agconnect-applinking = {module = "com.huawei.agconnect:agconnect-applinking", version.ref = "agcVersion"}
+agconnect-crash = { module = "com.huawei.agconnect:agconnect-crash", version.ref = "agcVersion" }
+agconnect-appmessaging = {module = "com.huawei.agconnect:agconnect-appmessaging", version.ref = "agcVersion"}
+threetenabp = { module = "com.jakewharton.threetenabp:threetenabp", version.ref = "threetenabpVersion" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+agcp = {id = "com.huawei.agconnect.agcp", version.ref = "agcVersion"}
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
