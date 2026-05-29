@@ -4,10 +4,11 @@
 # 文档：https://docs.cnb.cool/zh/build/web-trigger.html
 # ==========================================
 
-- reg: ^main$
-  buttons:
-    - name: 手动构建 APK
-      description: 手动触发流水线构建 Release APK
-      event: web_trigger_build_apk
-      isDefault: true
-      groupName: 构建操作
+branch:
+  - reg: ^main$
+    buttons:
+      - name: 手动构建 APK
+        description: 手动触发流水线构建 Release APK
+        event: web_trigger_build_apk
+        isDefault: true
+        groupName: 构建操作
