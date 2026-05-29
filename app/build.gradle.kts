@@ -37,14 +37,19 @@ android {
 
   signingConfigs {
     create("release") {
-      // 优先从环境变量读取（密钥库导入），其次从 gradle.properties 读取
+      // 优先从密钥仓库导入的原始变量名读取（CI 环境，imports 直接注入）
+      // 其次从 RELEASE_* 变量名读取（全局 env 映射后的变量）
+      // 最后从 gradle.properties 读取（本地开发）
       val keystoreFilePath = System.getenv("RELEASE_STORE_FILE")
           ?: (project.findProperty("RELEASE_STORE_FILE") as String?)
-      val keystorePwd = System.getenv("RELEASE_STORE_PASSWORD")
+      val keystorePwd = System.getenv("KEYSTORE_PASSWORD")
+          ?: System.getenv("RELEASE_STORE_PASSWORD")
           ?: (project.findProperty("RELEASE_STORE_PASSWORD") as String?)
-      val aliasName = System.getenv("RELEASE_KEY_ALIAS")
+      val aliasName = System.getenv("KEY_ALIAS")
+          ?: System.getenv("RELEASE_KEY_ALIAS")
           ?: (project.findProperty("RELEASE_KEY_ALIAS") as String?)
-      val keyPwd = System.getenv("RELEASE_KEY_PASSWORD")
+      val keyPwd = System.getenv("KEY_PASSWORD")
+          ?: System.getenv("RELEASE_KEY_PASSWORD")
           ?: (project.findProperty("RELEASE_KEY_PASSWORD") as String?)
 
       if (keystoreFilePath != null && keystorePwd != null && aliasName != null && keyPwd != null) {
