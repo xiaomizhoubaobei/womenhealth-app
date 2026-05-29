@@ -1,18 +1,14 @@
-# Android Studio
-*.iml
-.gradle
-.idea/
+.kotlin
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+/build
+/captures
+.cxx
 local.properties
-.DS_Store
-/captures/
-.externalNativeBuild
-.cxx/
-
-# Keystore files
-*.jks
-*.keystore
-
-# Script and config files
-*.ps1
-/导出Git变更.bat
-/gradle1.properties
+.env
+debug.keystore

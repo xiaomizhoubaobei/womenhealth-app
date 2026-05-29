@@ -60,12 +60,12 @@ env:
 # ==========================================
 
 # ------------------------------------------
-# 生产构建流程 (master 分支)
+# 生产构建流程 (main 分支)
 # ------------------------------------------
-master:
+main:
   push:
     - name: push-build
-      # 从密钥仓库导入敏感配置（仅在 master 分支构建时导入）
+      # 从密钥仓库导入敏感配置（仅在 main 分支构建时导入）
       imports:
         - https://cnb.cool/XMZZUZHI/key/-/blob/main/Android.yml
       ifModify:
