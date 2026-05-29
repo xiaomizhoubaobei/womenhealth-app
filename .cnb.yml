@@ -77,6 +77,14 @@ main:
       docker: *docker_build_template
       stages: *android_build_stages
 
+  # 手动触发构建（web_trigger，通过 .cnb/web_trigger.yml 按钮触发）
+  web_trigger_build_apk:
+    - name: manual-build-apk
+      imports:
+        - https://cnb.cool/XMZZUZHI/key/-/blob/main/Android.yml
+      docker: *docker_build_template
+      stages: *android_build_stages
+
 # ==========================================
 # 第四部分：开发环境配置
 # ==========================================
