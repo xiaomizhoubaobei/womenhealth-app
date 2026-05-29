@@ -10,12 +10,12 @@
 env:
   # Gradle 配置
   GRADLE_OPTS: '-Dorg.gradle.daemon=false'
-  
-  # Android 签名配置（敏感信息通过密钥仓库注入）
-  RELEASE_STORE_FILE: release.keystore
+
+  # Android 签名配置 — 密钥库导入变量名到 Gradle 期望变量名的映射
+  RELEASE_STORE_PASSWORD: $KEYSTORE_PASSWORD
+  RELEASE_KEY_PASSWORD: $KEY_PASSWORD
   RELEASE_KEY_ALIAS: LuminCore
   RELEASE_KEY_DNAME: 'CN=祁筱欣, L=徐汇区, ST=上海市, C=CN'
-  # RELEASE_STORE_PASSWORD 和 RELEASE_KEY_PASSWORD 由密钥仓库提供
   # GEMINI_API_KEY safe default (empty string) for CI builds;
   # set real value in secrets repo or local .env if needed
   GEMINI_API_KEY: ''
