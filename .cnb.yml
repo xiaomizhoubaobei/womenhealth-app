@@ -16,6 +16,9 @@ env:
   RELEASE_KEY_ALIAS: LuminCore
   RELEASE_KEY_DNAME: 'CN=祁筱欣, L=徐汇区, ST=上海市, C=CN'
   # RELEASE_STORE_PASSWORD 和 RELEASE_KEY_PASSWORD 由密钥仓库提供
+  # GEMINI_API_KEY safe default (empty string) for CI builds;
+  # set real value in secrets repo or local .env if needed
+  GEMINI_API_KEY: ''
 
 # ==========================================
 # 第二部分：锚点定义（可复用配置块）
