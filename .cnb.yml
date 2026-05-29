@@ -12,6 +12,8 @@ env:
   GRADLE_OPTS: '-Dorg.gradle.daemon=false'
 
   # Android 签名配置 — 密钥库导入变量名到 Gradle 期望变量名的映射
+  # RELEASE_STORE_FILE: keystore 文件路径（相对于 app/ 目录，因为 build.gradle.kts 中 file() 解析基于模块目录）
+  RELEASE_STORE_FILE: release.keystore
   RELEASE_STORE_PASSWORD: $KEYSTORE_PASSWORD
   RELEASE_KEY_PASSWORD: $KEY_PASSWORD
   RELEASE_KEY_ALIAS: LuminCore
