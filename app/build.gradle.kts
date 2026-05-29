@@ -26,16 +26,16 @@ android {
   signingConfigs {
     create("release") {
       // 从gradle.properties读取签名配置
-      val keystoreFile = project.findProperty("RELEASE_STORE_FILE") as String?
-      val keystorePassword = project.findProperty("RELEASE_STORE_PASSWORD") as String?
-      val keyAlias = project.findProperty("RELEASE_KEY_ALIAS") as String?
-      val keyPassword = project.findProperty("RELEASE_KEY_PASSWORD") as String?
+      val keystoreFilePath = project.findProperty("RELEASE_STORE_FILE") as String?
+      val keystorePwd = project.findProperty("RELEASE_STORE_PASSWORD") as String?
+      val aliasName = project.findProperty("RELEASE_KEY_ALIAS") as String?
+      val keyPwd = project.findProperty("RELEASE_KEY_PASSWORD") as String?
       
-      if (keystoreFile != null && keystorePassword != null && keyAlias != null && keyPassword != null) {
-        storeFile = file(keystoreFile)
-        storePassword = keystorePassword
-        this.keyAlias = keyAlias
-        keyPassword = keyPassword
+      if (keystoreFilePath != null && keystorePwd != null && aliasName != null && keyPwd != null) {
+        storeFile = file(keystoreFilePath)
+        storePassword = keystorePwd
+        this.keyAlias = aliasName
+        this.keyPassword = keyPwd
       }
       
       // 启用V1、V2、V3、V4签名
