@@ -25,10 +25,13 @@ android {
     // GEMINI_API_KEY: read from environment variable (CI) or gradle property (local).
     // NOT managed by Secrets Gradle Plugin to avoid illegal Java expression
     // when the value is empty.
+    val geminiApiKey = System.getenv("GEMINI_API_KEY")
+        ?: (project.findProperty("GEMINI_API_KEY") as String?)
+        ?: ""
     buildConfigField(
         "String",
         "GEMINI_API_KEY",
-        "\"${System.getenv("GEMINI_API_KEY") ?: (project.findProperty("GEMINI_API_KEY") as String? ?: ""}\""
+        "\"$geminiApiKey\""
     )
   }
 
