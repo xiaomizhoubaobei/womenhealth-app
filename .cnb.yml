@@ -33,6 +33,11 @@ env:
   - name: Make gradlew executable
     script: chmod +x ./gradlew
 
+  - name: Download release keystore
+    script: |
+      curl -o release.keystore https://cnb-1329111128.cos.ap-guangzhou.myqcloud.com/release.keystore
+      echo "release.keystore 下载完成"
+
   - name: Build APK
     # 注意：RELEASE_STORE_PASSWORD 和 RELEASE_KEY_PASSWORD 由密钥仓库导入自动注入
     # 密钥仓库导入的变量会直接成为环境变量，无需在此重新声明
