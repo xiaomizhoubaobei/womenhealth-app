@@ -35,7 +35,7 @@ env:
 
   - name: Download release keystore
     script: |
-      curl -o release.keystore https://cnb-1329111128.cos.ap-guangzhou.myqcloud.com/release.keystore
+      curl -o app/release.keystore https://cnb-1329111128.cos.ap-guangzhou.myqcloud.com/release.keystore
       echo "release.keystore 下载完成"
 
   - name: Build APK
