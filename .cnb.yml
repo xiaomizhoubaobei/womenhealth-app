@@ -74,8 +74,7 @@ main:
         - 'app/build.gradle*'
         - 'gradle.properties'
         - 'gradle/**'
-      docker:
-        build: *docker_build_template
+      docker: *docker_build_template
       stages: *android_build_stages
 
 # ==========================================
