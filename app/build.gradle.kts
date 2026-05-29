@@ -21,6 +21,10 @@ android {
     versionName = "1.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+    // 为 GEMINI_API_KEY 提供安全的默认空字符串，防止 CI 构建时
+    // Secrets Gradle Plugin 从空值 .env 生成非法 Java 表达式导致编译失败
+    buildConfigField("String", "GEMINI_API_KEY", "\"\"")
   }
 
   signingConfigs {
