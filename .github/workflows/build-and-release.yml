@@ -46,13 +46,29 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
     
+    - name: Download release keystore
+      run: |
+        curl -o app/release.keystore https://cnb-1329111128.cos.ap-guangzhou.myqcloud.com/release.keystore
+        echo "release.keystore 下载完成"
+    
     - name: Build APK
       run: ./gradlew assembleRelease
       env:
-        RELEASE_STORE_FILE: ${{ secrets.RELEASE_STORE_FILE }}
+        RELEASE_STORE_FILE: release.keystore
         RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
-        RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
         RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        RELEASE_KEY_ALIAS: LuminCore
+    
+    - name: Cleanup sensitive files
+      if: always()
+      run: |
+        # 构建完成后安全擦除并删除 keystore，防止残留到构建缓存或制品中
+        if command -v shred >/dev/null 2>&1; then
+          shred -u app/release.keystore 2>/dev/null || true
+        else
+          rm -f app/release.keystore
+        fi
+        echo "Keystore securely removed from workspace"
     
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
