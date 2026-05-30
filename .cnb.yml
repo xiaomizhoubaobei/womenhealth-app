@@ -82,7 +82,9 @@ env:
       echo "Keystore securely removed from workspace"
 
   - name: Upload APK to build artifacts
-    # 所有事件均上传构建附件到当前 commit（非 tag_push 时默认操作对象为 commit 附件）
+    # 仅在非 tag_push 事件时上传到 commit 附件；tag_push 由后面的 Attach APK to Release 处理
+    if: |
+      [ "$CNB_EVENT" != "tag_push" ]
     image: cnbcool/attachments:latest
     settings:
       attachments:
@@ -129,8 +131,8 @@ env:
       [ "$CNB_EVENT" = "tag_push" ]
     type: git:release
     options:
-      # tag_push 事件自动取触发事件的 Tag 名（CNB_BRANCH）
-      tag: ${CNB_BRANCH}
+      # tag_push 事件无需传入 tag 参数，自动取触发事件的 Tag 名
+      title: "LuminCore V${VERSION}"
       # description 与 descriptionFromFile 互斥，使用文件以包含自动生成的变更日志
       descriptionFromFile: RELEASE_NOTES.md
 
