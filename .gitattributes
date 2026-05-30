@@ -1,0 +1,11 @@
+# Binary files - prevent UTF-8 encoding corruption
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
+*.gif binary
+*.ico binary
+*.bmp binary
+*.keystore binary
+*.jks binary
+*.webp binary
