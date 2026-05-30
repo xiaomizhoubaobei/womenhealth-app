@@ -9,7 +9,7 @@
 
 env:
   # Gradle 配置
-  GRADLE_OPTS: '-Dorg.gradle.daemon=false'
+  GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true'
 
   # Android 签名配置 — 密钥库导入变量名到 Gradle 期望变量名的映射
   # RELEASE_STORE_FILE: keystore 文件路径（相对于 app/ 目录，因为 build.gradle.kts 中 file() 解析基于模块目录）
@@ -33,7 +33,7 @@ env:
     - /root/.gradle/caches
     - /root/.gradle/wrapper
 
-# Android 构建阶段锚点
+# Android 构建阶段锚点（通用：push / tag_push / web_trigger 均引用此锚点）
 .android_build_stages: &android_build_stages
   - name: Make gradlew executable
     script: chmod +x ./gradlew
@@ -51,19 +51,99 @@ env:
 
   - name: Get version info
     script: |
-      VERSION_CODE=$(grep "versionCode" app/build.gradle.kts | head -1 | awk -F '= ' '{print $2}' | tr -d ' ')
-      VERSION_NAME=$(grep "versionName" app/build.gradle.kts | head -1 | awk -F '= "' '{print $2}' | tr -d '"')
-      echo "##[set-output VERSION_CODE=$VERSION_CODE]"
-      echo "##[set-output VERSION_NAME=$VERSION_NAME]"
+      # 提取对外版本号（versionName）和内部构建号（versionCode）
+      BUILD_NUMBER=$(grep -E "versionCode\s*=" app/build.gradle.kts | head -1 | sed -E 's/.*=\s*([0-9]+).*/\1/')
+      VERSION=$(grep -E "versionName\s*=" app/build.gradle.kts | head -1 | sed -E 's/.*=\s*"([^"]+)".*/\1/')
+      BUILD_TIME=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+      echo "##[set-output BUILD_NUMBER=$BUILD_NUMBER]"
+      echo "##[set-output VERSION=$VERSION]"
+      echo "##[set-output BUILD_TIME=$BUILD_TIME]"
     exports:
-      VERSION_CODE: VERSION_CODE
-      VERSION_NAME: VERSION_NAME
+      BUILD_NUMBER: BUILD_NUMBER
+      VERSION: VERSION
+      BUILD_TIME: BUILD_TIME
 
-  - name: Upload APK artifact
+  - name: Prepare artifact
+    script: |
+      mkdir -p release
+      cp app/build/outputs/apk/release/app-release.apk "release/LuminCore-v${VERSION}-b${BUILD_NUMBER}.apk"
+      # 保留一份固定路径的引用，方便后续步骤或本地调试
+      ln -sf "LuminCore-v${VERSION}-b${BUILD_NUMBER}.apk" "release/LuminCore-latest.apk"
+      ls -la release/
+
+  - name: Cleanup sensitive files
+    script: |
+      # 构建完成后立即安全擦除并删除 keystore，防止残留到构建缓存或制品中
+      if command -v shred >/dev/null 2>&1; then
+        shred -u app/release.keystore 2>/dev/null || true
+      else
+        rm -f app/release.keystore
+      fi
+      echo "Keystore securely removed from workspace"
+
+  - name: Upload APK to build artifacts
+    # 所有事件均上传构建附件到当前 commit（非 tag_push 时默认操作对象为 commit 附件）
     image: cnbcool/attachments:latest
     settings:
       attachments:
-        - app/build/outputs/apk/release/app-release.apk
+        - release/LuminCore-v${VERSION}-b${BUILD_NUMBER}.apk
+
+  - name: Generate changelog
+    # 仅在 tag_push 时生成变更日志
+    if: |
+      [ "$CNB_EVENT" = "tag_push" ]
+    image: cnbcool/changelog
+    settings:
+      latestChangeLogTarget: LATEST_CHANGELOG.md
+
+  - name: Prepare release notes
+    # 仅在 tag_push 时合并构建信息与变更日志，并去除提交前缀
+    if: |
+      [ "$CNB_EVENT" = "tag_push" ]
+    script: |
+      cat > RELEASE_NOTES.md << EOF
+      ## LuminCore V${VERSION}
+
+      **构建信息**
+      - 版本号: ${VERSION}
+      - 构建号: ${BUILD_NUMBER}
+      - 构建时间: ${BUILD_TIME}
+      - 提交 SHA: ${CNB_COMMIT}
+      - 提交者: ${CNB_COMMITTER}
+      - 构建产物: LuminCore-v${VERSION}-b${BUILD_NUMBER}.apk
+
+      **本次更新内容**
+      EOF
+      if [ -f LATEST_CHANGELOG.md ]; then
+        # 去除 feat/fix/chore/docs/style/refactor/perf/test/build/ci/revert 等前缀（支持带作用域如 feat(模块):）
+        sed -E 's/^- (feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)(\([^)]+\))?:\s*/- /' LATEST_CHANGELOG.md >> RELEASE_NOTES.md
+      else
+        echo "（无详细变更日志）" >> RELEASE_NOTES.md
+      fi
+      echo "Release notes prepared"
+      cat RELEASE_NOTES.md
+
+  - name: Create Release
+    # 仅在 tag_push 事件时创建 Release；main.push / web_trigger 时自动跳过
+    if: |
+      [ "$CNB_EVENT" = "tag_push" ]
+    type: git:release
+    options:
+      # tag_push 事件无需传入 tag 参数，自动取触发事件的 Tag 名
+      title: "LuminCore V${VERSION}"
+      # description 与 descriptionFromFile 互斥，使用文件以包含自动生成的变更日志
+      descriptionFromFile: RELEASE_NOTES.md
+
+  - name: Attach APK to Release
+    # tag_push 事件下不传 tag 参数时，默认取 $CNB_BRANCH（即当前 tag），操作对象为 tag 对应的 release 附件
+    # 文档说明："tag 需有对应的 release 才能上传附件"，因此必须放在 git:release 创建之后
+    if: |
+      [ "$CNB_EVENT" = "tag_push" ]
+    image: cnbcool/attachments:latest
+    settings:
+      type: UPLOAD
+      attachments:
+        - release/LuminCore-v${VERSION}-b${BUILD_NUMBER}.apk
 
 # ==========================================
 # 第三部分：构建工作流定义
@@ -90,6 +170,18 @@ main:
   # 手动触发构建（web_trigger，通过 .cnb/web_trigger.yml 按钮触发）
   web_trigger_build_apk:
     - name: manual-build-apk
+      imports:
+        - https://cnb.cool/XMZZUZHI/key/-/blob/main/Android.yml
+      docker: *docker_build_template
+      stages: *android_build_stages
+
+# ------------------------------------------
+# Tag 推送：自动构建并创建 Release
+# 任意分支推送 Tag 时触发，Release 相关阶段通过 if 条件自动执行
+# ------------------------------------------
+$:
+  tag_push:
+    - name: build-and-release-on-tag
       imports:
         - https://cnb.cool/XMZZUZHI/key/-/blob/main/Android.yml
       docker: *docker_build_template
