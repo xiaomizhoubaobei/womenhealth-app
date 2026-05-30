@@ -129,8 +129,8 @@ env:
       [ "$CNB_EVENT" = "tag_push" ]
     type: git:release
     options:
-      # tag_push 事件无需传入 tag 参数，自动取触发事件的 Tag 名
-      title: "LuminCore V${VERSION}"
+      # tag_push 事件自动取触发事件的 Tag 名（CNB_BRANCH）
+      tag: ${CNB_BRANCH}
       # description 与 descriptionFromFile 互斥，使用文件以包含自动生成的变更日志
       descriptionFromFile: RELEASE_NOTES.md
 
