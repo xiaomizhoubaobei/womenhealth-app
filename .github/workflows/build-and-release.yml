@@ -81,9 +81,7 @@ jobs:
 
     - name: Rename APK
       run: |
-        mv 
-          app/build/outputs/apk/release/app-release.apk 
-          app/build/outputs/apk/release/LuminCore-v${{ steps.version.outputs.version_name }}-${{ steps.version.outputs.version_code }}.apk
+        mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/LuminCore-v${{ steps.version.outputs.version_name }}-${{ steps.version.outputs.version_code }}.apk
 
     - name: Check if tag exists
       id: check_tag
@@ -116,49 +114,34 @@ jobs:
         while IFS= read -r line; do
           case "$line" in
             feat\(*:*)
-              FEATURES="${FEATURES}- $(echo "$line" | sed -E 's/^(feat|fix|chore)\(([^)]+)\): //')
-"
+              FEATURES="${FEATURES}- $(echo "$line" | sed -E 's/^(feat|fix|chore)\(([^)]+)\): //')"
               ;;
             fix\(*:*)
-              FIXES="${FIXES}- $(echo "$line" | sed -E 's/^(feat|fix|chore)\(([^)]+)\): //')
-"
+              FIXES="${FIXES}- $(echo "$line" | sed -E 's/^(feat|fix|chore)\(([^)]+)\): //')"
               ;;
             chore\(*:*)
-              CHORES="${CHORES}- $(echo "$line" | sed -E 's/^(feat|fix|chore)\(([^)]+)\): //')
-"
+              CHORES="${CHORES}- $(echo "$line" | sed -E 's/^(feat|fix|chore)\(([^)]+)\): //')"
               ;;
             feat:*)
-              FEATURES="${FEATURES}- $(echo "$line" | sed -E 's/^(feat|fix|chore): //')
-"
+              FEATURES="${FEATURES}- $(echo "$line" | sed -E 's/^(feat|fix|chore): //')"
               ;;
             fix:*)
-              FIXES="${FIXES}- $(echo "$line" | sed -E 's/^(feat|fix|chore): //')
-"
+              FIXES="${FIXES}- $(echo "$line" | sed -E 's/^(feat|fix|chore): //')"
               ;;
             chore:*)
-              CHORES="${CHORES}- $(echo "$line" | sed -E 's/^(feat|fix|chore): //')
-"
+              CHORES="${CHORES}- $(echo "$line" | sed -E 's/^(feat|fix|chore): //')"
               ;;
             *)
-              OTHERS="${OTHERS}- $line
-"
+              OTHERS="${OTHERS}- $line"
               ;;
           esac
         done <<< "$COMMITS"
 
         NOTES=""
-        [ -n "$FEATURES" ] && NOTES="${NOTES}## 🚀 Features
-${FEATURES}
-"
-        [ -n "$FIXES" ]    && NOTES="${NOTES}## 🐛 Bug Fixes
-${FIXES}
-"
-        [ -n "$CHORES" ]   && NOTES="${NOTES}## 🧹 Chores
-${CHORES}
-"
-        [ -n "$OTHERS" ]   && NOTES="${NOTES}## 📌 Others
-${OTHERS}
-"
+        [ -n "$FEATURES" ] && NOTES="${NOTES}## 🚀 Features\n${FEATURES}\n"
+        [ -n "$FIXES" ]    && NOTES="${NOTES}## 🐛 Bug Fixes\n${FIXES}\n"
+        [ -n "$CHORES" ]   && NOTES="${NOTES}## 🧹 Chores\n${CHORES}\n"
+        [ -n "$OTHERS" ]   && NOTES="${NOTES}## 📌 Others\n${OTHERS}\n"
 
         echo "notes<<EOF" >> $GITHUB_OUTPUT
         echo -e "$NOTES" >> $GITHUB_OUTPUT
