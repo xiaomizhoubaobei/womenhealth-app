@@ -36,7 +36,7 @@ jobs:
         run: git remote add gitcode git@gitcode.com:xiaomizhou/womenhealth-app.git
 
       - name: Push to Gitcode
-        run: git push gitcode master
+        run: git push gitcode main
 
   sync-to-gitee:
     runs-on: ubuntu-latest
@@ -69,7 +69,7 @@ jobs:
         run: git remote add gitee git@gitee.com:qinjielove/womenhealth-app.git
 
       - name: Push to Gitee
-        run: git push gitee master
+        run: git push gitee main
 
   sync-to-codeup:
     runs-on: ubuntu-latest
@@ -102,7 +102,7 @@ jobs:
         run: git remote add codeup git@codeup.aliyun.com:686a57a36024b2147d89fbc0/womenhealthapp.git
 
       - name: Push to Codeup
-        run: git push codeup master
+        run: git push codeup main
 
   sync-to-huaweicloud:
     runs-on: ubuntu-latest
