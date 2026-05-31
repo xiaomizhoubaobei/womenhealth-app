@@ -14,30 +14,32 @@ env:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
+      with:
+        fetch-depth: 0
+
     - name: Setup JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
-    
+
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
-    
+
     - name: Validate Gradle Wrapper
       uses: gradle/actions/wrapper-validation@v3
-    
+
     - name: Make gradlew executable
       run: chmod +x ./gradlew
-    
+
     - name: Cache Gradle packages
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.gradle/caches
@@ -45,12 +47,12 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
-    
+
     - name: Download release keystore
       run: |
-        curl -o app/release.keystore https://cnb-1329111128.cos.ap-guangzhou.myqcloud.com/release.keystore
-        echo "release.keystore 下载完成"
-    
+        curl -L -o app/release.keystore https://cnb-1329111128.cos.ap-guangzhou.myqcloud.com/release.keystore
+        echo "release.keystore downloaded"
+
     - name: Build APK
       run: ./gradlew assembleRelease
       env:
@@ -58,50 +60,120 @@ jobs:
         RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
         RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
         RELEASE_KEY_ALIAS: LuminCore
-    
-    - name: Cleanup sensitive files
+
+    - name: Secure cleanup of keystore
       if: always()
       run: |
-        # 构建完成后安全擦除并删除 keystore，防止残留到构建缓存或制品中
         if command -v shred >/dev/null 2>&1; then
-          shred -u app/release.keystore 2>/dev/null || true
+          shred -u app/release.keystore || true
         else
           rm -f app/release.keystore
         fi
-        echo "Keystore securely removed from workspace"
-    
-    - name: Upload APK artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-release
-        path: app/build/outputs/apk/release/
-        retention-days: 30
-    
-    - name: Get version info
+        echo "Keystore removed"
+
+    - name: Extract version info
       id: version
       run: |
-        VERSION_CODE=$(grep "versionCode" app/build.gradle.kts | head -1 | awk -F '= ' '{print $2}' | tr -d ' ')
-        VERSION_NAME=$(grep "versionName" app/build.gradle.kts | head -1 | awk -F '= "' '{print $2}' | tr -d '"')
-        echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
+        VERSION_NAME=$(grep 'versionName' app/build.gradle.kts | head -1 | sed -E 's/.*"(.*)".*/\1/')
+        VERSION_CODE=$(grep 'versionCode' app/build.gradle.kts | head -1 | sed -E 's/.*=\s*([0-9]+).*/\1/')
         echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
-    
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
+
+    - name: Rename APK
+      run: |
+        mv 
+          app/build/outputs/apk/release/app-release.apk 
+          app/build/outputs/apk/release/LuminCore-v${{ steps.version.outputs.version_name }}-${{ steps.version.outputs.version_code }}.apk
+
+    - name: Check if tag exists
+      id: check_tag
+      run: |
+        TAG="v${{ steps.version.outputs.version_name }}"
+        if git rev-parse "$TAG" >/dev/null 2>&1; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Generate Release Notes
+      id: release_notes
+      run: |
+        PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+        if [ -z "$PREV_TAG" ]; then
+          COMMITS=$(git log --no-merges --pretty=format:"%s")
+        else
+          COMMITS=$(git log --no-merges --pretty=format:"%s" ${PREV_TAG}..HEAD)
+        fi
+
+        COMMITS=$(echo "$COMMITS" | sort -u)
+
+        FEATURES=""
+        FIXES=""
+        CHORES=""
+        OTHERS=""
+
+        while IFS= read -r line; do
+          case "$line" in
+            feat\(*:*)
+              FEATURES="${FEATURES}- $(echo "$line" | sed -E 's/^(feat|fix|chore)\(([^)]+)\): //')
+"
+              ;;
+            fix\(*:*)
+              FIXES="${FIXES}- $(echo "$line" | sed -E 's/^(feat|fix|chore)\(([^)]+)\): //')
+"
+              ;;
+            chore\(*:*)
+              CHORES="${CHORES}- $(echo "$line" | sed -E 's/^(feat|fix|chore)\(([^)]+)\): //')
+"
+              ;;
+            feat:*)
+              FEATURES="${FEATURES}- $(echo "$line" | sed -E 's/^(feat|fix|chore): //')
+"
+              ;;
+            fix:*)
+              FIXES="${FIXES}- $(echo "$line" | sed -E 's/^(feat|fix|chore): //')
+"
+              ;;
+            chore:*)
+              CHORES="${CHORES}- $(echo "$line" | sed -E 's/^(feat|fix|chore): //')
+"
+              ;;
+            *)
+              OTHERS="${OTHERS}- $line
+"
+              ;;
+          esac
+        done <<< "$COMMITS"
+
+        NOTES=""
+        [ -n "$FEATURES" ] && NOTES="${NOTES}## 🚀 Features
+${FEATURES}
+"
+        [ -n "$FIXES" ]    && NOTES="${NOTES}## 🐛 Bug Fixes
+${FIXES}
+"
+        [ -n "$CHORES" ]   && NOTES="${NOTES}## 🧹 Chores
+${CHORES}
+"
+        [ -n "$OTHERS" ]   && NOTES="${NOTES}## 📌 Others
+${OTHERS}
+"
+
+        echo "notes<<EOF" >> $GITHUB_OUTPUT
+        echo -e "$NOTES" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: Create GitHub Release
+      if: steps.check_tag.outputs.exists == 'false'
+      uses: softprops/action-gh-release@v3
       with:
         tag_name: v${{ steps.version.outputs.version_name }}
-        release_name: Release v${{ steps.version.outputs.version_name }}
+        name: Release v${{ steps.version.outputs.version_name }}
         draft: false
         prerelease: false
-    
-    - name: Upload Release APK
-      uses: actions/upload-release-asset@v1
+        body: ${{ steps.release_notes.outputs.notes }}
+        files: |
+          app/build/outputs/apk/release/LuminCore-v${{ steps.version.outputs.version_name }}-${{ steps.version.outputs.version_code }}.apk
       env:
-        GITHUB_TOKEN: ${{ secrets.TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: app/build/outputs/apk/release/app-release.apk
-        asset_name: womenhealth-v${{ steps.version.outputs.version_name }}.apk
-        asset_content_type: application/vnd.android.package-archive
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
