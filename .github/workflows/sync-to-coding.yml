@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 jobs:
@@ -135,4 +135,4 @@ jobs:
         run: git remote add huaweicloud git@codehub.devcloud.cn-north-4.huaweicloud.com:a95461d5a0a143a7b46d78c32e7f63b5/womenhealth-app.git
 
       - name: Push to HuaweiCloud
-        run: git push huaweicloud master
+        run: git push huaweicloud main

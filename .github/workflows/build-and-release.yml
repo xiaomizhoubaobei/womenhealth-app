@@ -2,7 +2,7 @@ name: Build and Release APK
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths:
       - 'app/src/**'
       - 'app/build.gradle*'
