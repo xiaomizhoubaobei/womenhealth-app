@@ -66,9 +66,9 @@ env:
   - name: Prepare artifact
     script: |
       mkdir -p release
-      cp app/build/outputs/apk/release/app-release.apk "release/LuminCore-v${VERSION}-b${BUILD_NUMBER}.apk"
+      cp app/build/outputs/apk/release/app-release.apk "release/LuminCore-v${VERSION}-${BUILD_NUMBER}.apk"
       # 保留一份固定路径的引用，方便后续步骤或本地调试
-      ln -sf "LuminCore-v${VERSION}-b${BUILD_NUMBER}.apk" "release/LuminCore-latest.apk"
+      ln -sf "LuminCore-v${VERSION}-${BUILD_NUMBER}.apk" "release/LuminCore-latest.apk"
       ls -la release/
 
   - name: Cleanup sensitive files
@@ -88,7 +88,7 @@ env:
     image: cnbcool/attachments:latest
     settings:
       attachments:
-        - release/LuminCore-v${VERSION}-b${BUILD_NUMBER}.apk
+        - release/LuminCore-v${VERSION}-${BUILD_NUMBER}.apk
 
   - name: Generate changelog
     # 仅在 tag_push 时生成变更日志
@@ -112,7 +112,7 @@ env:
       - 构建时间: ${BUILD_TIME}
       - 提交 SHA: ${CNB_COMMIT}
       - 提交者: ${CNB_COMMITTER}
-      - 构建产物: LuminCore-v${VERSION}-b${BUILD_NUMBER}.apk
+      - 构建产物: LuminCore-v${VERSION}-${BUILD_NUMBER}.apk
 
       **本次更新内容**
       EOF
@@ -145,7 +145,7 @@ env:
     settings:
       type: UPLOAD
       attachments:
-        - release/LuminCore-v${VERSION}-b${BUILD_NUMBER}.apk
+        - release/LuminCore-v${VERSION}-${BUILD_NUMBER}.apk
 
 # ==========================================
 # 第三部分：构建工作流定义
