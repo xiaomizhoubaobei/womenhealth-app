@@ -131,35 +131,47 @@ fun CalendarSection(
                                 val cellDate = currentMonthState.withDayOfMonth(absoluteDayCounter)
                                 val cellDateStr = cellDate.format(formatter)
 
-                                // 1. Check if dates fall in actual logged periods
+                                 // 1. Check if dates fall in actual logged periods
                                 var isLoggedPeriod = false
                                 var activeLog: PeriodRecord? = null
                                 for (record in records) {
-                                    val start = LocalDate.parse(record.startDate, formatter)
-                                    val end = if (record.endDate != null) {
-                                        LocalDate.parse(record.endDate, formatter)
-                                    } else {
-                                        start.plusDays(analysis.avgPeriodLength.toLong() - 1)
-                                    }
-                                    if (!cellDate.isBefore(start) && !cellDate.isAfter(end)) {
-                                        isLoggedPeriod = true
-                                        activeLog = record
-                                        break
+                                    try {
+                                        val start = LocalDate.parse(record.startDate, formatter)
+                                        val end = if (!record.endDate.isNullOrBlank()) {
+                                            LocalDate.parse(record.endDate, formatter)
+                                        } else {
+                                            start.plusDays(analysis.avgPeriodLength.toLong() - 1)
+                                        }
+                                        if (!cellDate.isBefore(start) && !cellDate.isAfter(end)) {
+                                            isLoggedPeriod = true
+                                            activeLog = record
+                                            break
+                                        }
+                                    } catch (e: Exception) {
+                                        // Ignore parsing error for corrupted entries
                                     }
                                 }
 
                                 // 2. Check if dates fall in predicted period window
-                                val predStart = LocalDate.parse(analysis.nextPeriodDate, formatter)
-                                val predEnd = predStart.plusDays(analysis.avgPeriodLength.toLong() - 1)
-                                val isPredictedPeriod = !cellDate.isBefore(predStart) && !cellDate.isAfter(predEnd)
+                                val isPredictedPeriod = try {
+                                    val predStart = LocalDate.parse(analysis.nextPeriodDate, formatter)
+                                    val predEnd = predStart.plusDays(analysis.avgPeriodLength.toLong() - 1)
+                                    !cellDate.isBefore(predStart) && !cellDate.isAfter(predEnd)
+                                } catch (e: Exception) {
+                                    false
+                                }
 
                                 // 3. Check if date is ovulation date
                                 val isOvulation = cellDateStr == analysis.ovulationDate
 
                                 // 4. Check if date falls in Fertile Window
-                                val fStart = LocalDate.parse(analysis.fertileWindowStart, formatter)
-                                val fEnd = LocalDate.parse(analysis.fertileWindowEnd, formatter)
-                                val isFertile = !cellDate.isBefore(fStart) && !cellDate.isAfter(fEnd)
+                                val isFertile = try {
+                                    val fStart = LocalDate.parse(analysis.fertileWindowStart, formatter)
+                                    val fEnd = LocalDate.parse(analysis.fertileWindowEnd, formatter)
+                                    !cellDate.isBefore(fStart) && !cellDate.isAfter(fEnd)
+                                } catch (e: Exception) {
+                                    false
+                                }
 
                                 // Layout representation
                                 Box(
@@ -238,13 +250,17 @@ fun CalendarSection(
             focusedDate?.let { date ->
                 val dateStr = date.format(formatter)
                 val logForDay = records.find { rec ->
-                    val start = LocalDate.parse(rec.startDate, formatter)
-                    val end = if (rec.endDate != null) {
-                        LocalDate.parse(rec.endDate, formatter)
-                    } else {
-                        start.plusDays(analysis.avgPeriodLength.toLong() - 1)
+                    try {
+                        val start = LocalDate.parse(rec.startDate, formatter)
+                        val end = if (!rec.endDate.isNullOrBlank()) {
+                            LocalDate.parse(rec.endDate, formatter)
+                        } else {
+                            start.plusDays(analysis.avgPeriodLength.toLong() - 1)
+                        }
+                        !date.isBefore(start) && !date.isAfter(end)
+                    } catch (e: Exception) {
+                        false
                     }
-                    !date.isBefore(start) && !date.isAfter(end)
                 }
 
                 Box(
@@ -290,10 +306,13 @@ fun CalendarSection(
                             }
                         } else {
                             // Check if predicted
-                            val predStart = LocalDate.parse(analysis.nextPeriodDate, formatter)
-                            val predEnd = predStart.plusDays(analysis.avgPeriodLength.toLong() - 1)
-                            
-                            val isPredictionDay = !date.isBefore(predStart) && !date.isAfter(predEnd)
+                            val isPredictionDay = try {
+                                val predStart = LocalDate.parse(analysis.nextPeriodDate, formatter)
+                                val predEnd = predStart.plusDays(analysis.avgPeriodLength.toLong() - 1)
+                                !date.isBefore(predStart) && !date.isAfter(predEnd)
+                            } catch (e: Exception) {
+                                false
+                            }
                             val isOvday = dateStr == analysis.ovulationDate
 
                             when {

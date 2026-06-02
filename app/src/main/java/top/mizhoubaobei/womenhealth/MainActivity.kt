@@ -44,6 +44,10 @@ import top.mizhoubaobei.womenhealth.ui.components.CycleAnalyticsCard
 import top.mizhoubaobei.womenhealth.ui.components.HealingGuideCard
 import top.mizhoubaobei.womenhealth.ui.components.FuturePredictionsCard
 import top.mizhoubaobei.womenhealth.ui.components.MythBusterCard
+import top.mizhoubaobei.womenhealth.ui.components.BbtWeightTrackerCard
+import top.mizhoubaobei.womenhealth.ui.components.CycleEncyclopediaCard
+import top.mizhoubaobei.womenhealth.ui.components.NextPeriodPredictionCard
+import top.mizhoubaobei.womenhealth.ui.components.CycleTrendChartCard
 import top.mizhoubaobei.womenhealth.ui.theme.MyApplicationTheme
 import top.mizhoubaobei.womenhealth.ui.viewmodel.PeriodViewModel
 import top.mizhoubaobei.womenhealth.ui.viewmodel.PeriodViewModelFactory
@@ -76,6 +80,10 @@ class MainActivity : ComponentActivity() {
                 val moxaFootBath by viewModel.moxaFootBath.collectAsStateWithLifecycle()
                 val acupointMassage by viewModel.acupointMassage.collectAsStateWithLifecycle()
                 val herbalDiet by viewModel.herbalDiet.collectAsStateWithLifecycle()
+
+                val bbtWeightHistory by viewModel.bbtWeightHistory.collectAsStateWithLifecycle()
+                val todayBbt by viewModel.todayBbt.collectAsStateWithLifecycle()
+                val todayWeight by viewModel.todayWeight.collectAsStateWithLifecycle()
 
                 var isAddRecordSheetVisible by remember { mutableStateOf(false) }
                 var selectedCalendarDate by remember { mutableStateOf<LocalDate?>(LocalDate.now()) }
@@ -135,6 +143,14 @@ class MainActivity : ComponentActivity() {
 
                             Spacer(modifier = Modifier.height(20.dp))
 
+                            // New Feature: Next Period Prediction Card with confidence levels & detailed timeline
+                            NextPeriodPredictionCard(
+                                records = records,
+                                analysis = analysis
+                            )
+
+                            Spacer(modifier = Modifier.height(20.dp))
+
                             // 3. Dynamic Phase Suggestion Tips Box
                             PhaseAdviceBox(
                                 currentPhase = analysis.currentPhase,
@@ -159,6 +175,17 @@ class MainActivity : ComponentActivity() {
                                 onUpdateBeverage = { viewModel.updateBeverageType(it) },
                                 onUpdateSleep = { viewModel.updateSleepQuality(it) },
                                 onUpdateWarmth = { viewModel.updateWarmthLevel(it) }
+                            )
+
+                            Spacer(modifier = Modifier.height(20.dp))
+
+                            // New Feature 1: Basal Body Temperature & Weight Trends Tracker
+                            BbtWeightTrackerCard(
+                                history = bbtWeightHistory,
+                                todayBbt = todayBbt,
+                                todayWeight = todayWeight,
+                                onUpdateBbt = { viewModel.updateBbt(it) },
+                                onUpdateWeight = { viewModel.updateWeight(it) }
                             )
 
                             Spacer(modifier = Modifier.height(20.dp))
@@ -200,10 +227,22 @@ class MainActivity : ComponentActivity() {
 
                             Spacer(modifier = Modifier.height(24.dp))
 
+                            // Past 6 Months Cycle length trend visualization chart
+                            CycleTrendChartCard(
+                                records = records
+                            )
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
                             // 4c. Future Predictions Timeline Card
                             FuturePredictionsCard(
                                 analysis = analysis
                             )
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            // New Feature 3: Menstrual Cycle Biological Phases Encyclopedia
+                            CycleEncyclopediaCard()
 
                             Spacer(modifier = Modifier.height(24.dp))
 

@@ -246,7 +246,7 @@ fun WellnessTrackerCard(
                 ) {
                     val warmthOptions = listOf("畏寒 🥶", "适中 😐", "温暖 🔥")
                     warmthOptions.forEach { option ->
-                        val isSelected = warmthLevel == option.dropLast(2)
+                        val isSelected = warmthLevel == option.substringBefore(" ").trim()
                         val bg = if (isSelected) Color(0xFFFFF1F2) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f)
                         val border = if (isSelected) Color(0xFFFDA4AF) else Color.Transparent
 
@@ -255,7 +255,7 @@ fun WellnessTrackerCard(
                                 .weight(1f)
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(bg)
-                                .clickable { onUpdateWarmth(option.dropLast(2)) }
+                                .clickable { onUpdateWarmth(option.substringBefore(" ").trim()) }
                                 .padding(vertical = 8.dp),
                             contentAlignment = Alignment.Center
                         ) {
@@ -290,7 +290,7 @@ fun WellnessTrackerCard(
                 ) {
                     val sleepOptions = listOf("糟糕 🥱", "一般 😴", "很好 🥰")
                     sleepOptions.forEach { option ->
-                        val isSelected = sleepQuality == option.dropLast(2)
+                        val isSelected = sleepQuality == option.substringBefore(" ").trim()
                         val bg = if (isSelected) Color(0xFFEEF2FF) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f)
 
                         Box(
@@ -298,7 +298,7 @@ fun WellnessTrackerCard(
                                 .weight(1f)
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(bg)
-                                .clickable { onUpdateSleep(option.dropLast(2)) }
+                                .clickable { onUpdateSleep(option.substringBefore(" ").trim()) }
                                 .padding(vertical = 8.dp),
                             contentAlignment = Alignment.Center
                         ) {

@@ -28,6 +28,12 @@ data class ChatMessage(
     val isPlaceholder: Boolean = false
 )
 
+data class BbtWeightPoint(
+    val dateStr: String, // "yyyy-MM-dd"
+    val bbt: Float,     // Body temperature (0 means unrecorded)
+    val weight: Float   // Weight in kg (0 means unrecorded)
+)
+
 class PeriodViewModel(
     application: Application,
     private val repository: PeriodRepository
@@ -59,6 +65,16 @@ class PeriodViewModel(
 
     private val _herbalDiet = MutableStateFlow(prefs.getBoolean("herbal_diet_$todayStr", false))
     val herbalDiet: StateFlow<Boolean> = _herbalDiet.asStateFlow()
+
+    // Basal Body Temperature and Weight States
+    private val _todayBbt = MutableStateFlow(prefs.getFloat("bbt_$todayStr", 36.5f))
+    val todayBbt: StateFlow<Float> = _todayBbt.asStateFlow()
+
+    private val _todayWeight = MutableStateFlow(prefs.getFloat("weight_$todayStr", 52.0f))
+    val todayWeight: StateFlow<Float> = _todayWeight.asStateFlow()
+
+    private val _bbtWeightHistory = MutableStateFlow<List<BbtWeightPoint>>(emptyList())
+    val bbtWeightHistory: StateFlow<List<BbtWeightPoint>> = _bbtWeightHistory.asStateFlow()
 
     fun updateMode(mode: String) {
         prefs.edit().putString("current_mode", mode).apply()
@@ -102,6 +118,32 @@ class PeriodViewModel(
         val nextVal = !_herbalDiet.value
         prefs.edit().putBoolean("herbal_diet_$todayStr", nextVal).apply()
         _herbalDiet.value = nextVal
+    }
+
+    fun updateBbt(value: Float) {
+        prefs.edit().putFloat("bbt_$todayStr", value).apply()
+        _todayBbt.value = value
+        refreshBbtWeightHistory()
+    }
+
+    fun updateWeight(value: Float) {
+        prefs.edit().putFloat("weight_$todayStr", value).apply()
+        _todayWeight.value = value
+        refreshBbtWeightHistory()
+    }
+
+    fun refreshBbtWeightHistory() {
+        val list = mutableListOf<BbtWeightPoint>()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val today = LocalDate.now()
+        for (i in 6 downTo 0) {
+            val d = today.minusDays(i.toLong())
+            val dStr = d.format(formatter)
+            val b = prefs.getFloat("bbt_$dStr", 0f)
+            val w = prefs.getFloat("weight_$dStr", 0f)
+            list.add(BbtWeightPoint(dStr, b, w))
+        }
+        _bbtWeightHistory.value = list
     }
 
     // Period History records from local storage
@@ -174,6 +216,31 @@ class PeriodViewModel(
                 repository.insert(record1)
             }
         }
+
+        // Seed realistic temperature/weight history for the last 7 days if empty
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val today = LocalDate.now()
+        var hasAnySeed = false
+        for (i in 0..6) {
+            val dStr = today.minusDays(i.toLong()).format(formatter)
+            if (prefs.getFloat("bbt_$dStr", 0f) > 0f) {
+                hasAnySeed = true
+            }
+        }
+        if (!hasAnySeed) {
+            val seedTemps = listOf(36.42f, 36.38f, 36.45f, 36.25f, 36.68f, 36.75f, 36.82f)
+            val seedWeights = listOf(52.4f, 52.3f, 52.5f, 52.2f, 52.0f, 52.1f, 52.3f)
+            for (i in 0..6) {
+                val dStr = today.minusDays((6 - i).toLong()).format(formatter)
+                prefs.edit()
+                    .putFloat("bbt_$dStr", seedTemps[i])
+                    .putFloat("weight_$dStr", seedWeights[i])
+                    .apply()
+            }
+            _todayBbt.value = seedTemps.last()
+            _todayWeight.value = seedWeights.last()
+        }
+        refreshBbtWeightHistory()
     }
 
     fun addPeriodRecord(startDate: String, endDate: String?, flow: String, symptoms: List<String>, moods: List<String>, notes: String) {

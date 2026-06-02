@@ -53,6 +53,17 @@ fun AddRecordSheet(
     val selectedMoods = remember { mutableStateListOf<String>() }
 
     var noteText by remember { mutableStateOf("") }
+    
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    fun isValidDateStr(dateStr: String): Boolean {
+        return try {
+            LocalDate.parse(dateStr, formatter)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
 
     Dialog(
         onDismissRequest = onDismissRequest,
@@ -312,14 +323,52 @@ fun AddRecordSheet(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                errorMessage?.let { msg ->
+                    Text(
+                        text = msg,
+                        color = MaterialTheme.colorScheme.error,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
+                            .testTag("record_validation_error_text")
+                    )
+                }
+
                 // Bottom Action Button Row
                 Button(
                     onClick = {
+                        errorMessage = null
+                        if (startDate.isBlank() || !isValidDateStr(startDate)) {
+                            errorMessage = "⚠️ 开始日期格式不正确，请输入 YYYY-MM-DD (如 ${today.format(formatter)})"
+                            return@Button
+                        }
+                        var finalEndDate: String? = null
+                        if (hasEnded) {
+                            if (endDate.isBlank() || !isValidDateStr(endDate)) {
+                                errorMessage = "⚠️ 结束日期格式不正确，请输入 YYYY-MM-DD (如 ${today.plusDays(4).format(formatter)})"
+                                return@Button
+                            }
+                            try {
+                                val start = LocalDate.parse(startDate, formatter)
+                                val end = LocalDate.parse(endDate, formatter)
+                                if (end.isBefore(start)) {
+                                    errorMessage = "⚠️ 结束日期不能早于开始开始日期哦！"
+                                    return@Button
+                                }
+                                finalEndDate = endDate
+                            } catch (e: Exception) {
+                                errorMessage = "⚠️ 日期解析错误，请检查输入格式"
+                                return@Button
+                            }
+                        }
+
                         val symps = if (selectedSymptoms.isEmpty()) listOf("无症状") else selectedSymptoms.toList()
                         val mds = if (selectedMoods.isEmpty()) listOf("平静") else selectedMoods.toList()
                         onSaveRecord(
                             startDate,
-                            if (hasEnded) endDate else null,
+                            finalEndDate,
                             selectedFlow,
                             symps,
                             mds,

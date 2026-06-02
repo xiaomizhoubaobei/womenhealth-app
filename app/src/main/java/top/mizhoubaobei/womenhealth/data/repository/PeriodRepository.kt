@@ -56,21 +56,35 @@ class PeriodRepository(private val periodDao: PeriodDao) {
         }
 
         // Records are sorted DESC by startDate (records[0] is latest)
-        val sortedRecords = records.sortedByDescending { LocalDate.parse(it.startDate, formatter) }
+        val sortedRecords = records.sortedByDescending { 
+            try {
+                LocalDate.parse(it.startDate, formatter)
+            } catch (e: Exception) {
+                LocalDate.of(1970, 1, 1)
+            }
+        }
         val latestRecord = sortedRecords[0]
-        val latestStart = LocalDate.parse(latestRecord.startDate, formatter)
+        val latestStart = try {
+            LocalDate.parse(latestRecord.startDate, formatter)
+        } catch (e: Exception) {
+            today
+        }
 
         // 2. Compute Average Period Length (Duration of bleeding)
         var totalPeriodDays = 0L
         var validPeriodCount = 0
         for (record in sortedRecords) {
-            if (record.endDate != null) {
-                val start = LocalDate.parse(record.startDate, formatter)
-                val end = LocalDate.parse(record.endDate, formatter)
-                if (!end.isBefore(start)) {
-                    val duration = ChronoUnit.DAYS.between(start, end) + 1
-                    totalPeriodDays += duration
-                    validPeriodCount++
+            if (!record.endDate.isNullOrBlank()) {
+                try {
+                    val start = LocalDate.parse(record.startDate, formatter)
+                    val end = LocalDate.parse(record.endDate, formatter)
+                    if (!end.isBefore(start)) {
+                        val duration = ChronoUnit.DAYS.between(start, end) + 1
+                        totalPeriodDays += duration
+                        validPeriodCount++
+                    }
+                } catch (e: Exception) {
+                    // Ignore parsing error for corrupted entries
                 }
             }
         }
@@ -84,12 +98,16 @@ class PeriodRepository(private val periodDao: PeriodDao) {
         var totalCycleDays = 0L
         var validCycleCount = 0
         for (i in 0 until sortedRecords.size - 1) {
-            val currentStart = LocalDate.parse(sortedRecords[i].startDate, formatter)
-            val nextStart = LocalDate.parse(sortedRecords[i + 1].startDate, formatter)
-            val diff = ChronoUnit.DAYS.between(nextStart, currentStart)
-            if (diff in 15..50) { // filter out physiological anomalies
-                totalCycleDays += diff
-                validCycleCount++
+            try {
+                val currentStart = LocalDate.parse(sortedRecords[i].startDate, formatter)
+                val nextStart = LocalDate.parse(sortedRecords[i + 1].startDate, formatter)
+                val diff = ChronoUnit.DAYS.between(nextStart, currentStart)
+                if (diff in 15..50) { // filter out physiological anomalies
+                    totalCycleDays += diff
+                    validCycleCount++
+                }
+            } catch (e: Exception) {
+                // Ignore parsing error for corrupted entries
             }
         }
         val avgCycleLength = if (validCycleCount > 0) {
@@ -112,13 +130,17 @@ class PeriodRepository(private val periodDao: PeriodDao) {
 
         // 7. Determine state and phase
         // Is user currently bleeding (in period)?
-        val isCurrentlyInPeriod = if (latestRecord.endDate == null) {
+        val isCurrentlyInPeriod = if (latestRecord.endDate.isNullOrBlank()) {
             // No end date logged, count in period if today is within average period range from start
             currentCycleDay <= avgPeriodLength
         } else {
             // End date logged, check if today is between start and end date
-            val endDate = LocalDate.parse(latestRecord.endDate, formatter)
-            !today.isBefore(latestStart) && !today.isAfter(endDate)
+            try {
+                val endDate = LocalDate.parse(latestRecord.endDate, formatter)
+                !today.isBefore(latestStart) && !today.isAfter(endDate)
+            } catch (e: Exception) {
+                currentCycleDay <= avgPeriodLength
+            }
         }
 
         val currentPhase: String
