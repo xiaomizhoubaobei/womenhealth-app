@@ -1,4 +1,4 @@
-name: Build and Release APK
+name: 构建并发布 APK
 
 on:
   push:
@@ -17,146 +17,258 @@ jobs:
   build-and-release:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Setup JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
+      - name: 设置 JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
+      - name: 设置 Gradle
+        uses: gradle/actions/setup-gradle@v3
 
-    - name: Validate Gradle Wrapper
-      uses: gradle/actions/wrapper-validation@v3
+      - name: 校验 Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v3
 
-    - name: Make gradlew executable
-      run: chmod +x ./gradlew
+      - name: 赋予 gradlew 执行权限
+        run: chmod +x ./gradlew
 
-    - name: Cache Gradle packages
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
+      - name: 缓存 Gradle 依赖
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
-    - name: Download release keystore
-      run: |
-        curl -L -o app/release.keystore https://cnb-1329111128.cos.ap-guangzhou.myqcloud.com/release.keystore
-        echo "release.keystore downloaded"
+      - name: 下载签名证书
+        run: |
+          curl -L -o app/release.keystore https://cnb-1329111128.cos.ap-guangzhou.myqcloud.com/release.keystore
+          echo "签名证书下载完成"
 
-    - name: Build APK
-      run: ./gradlew assembleRelease
-      env:
-        RELEASE_STORE_FILE: release.keystore
-        RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
-        RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-        RELEASE_KEY_ALIAS: LuminCore
+      - name: 构建 APK
+        run: ./gradlew assembleRelease
+        env:
+          RELEASE_STORE_FILE: release.keystore
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          RELEASE_KEY_ALIAS: LuminCore
 
-    - name: Secure cleanup of keystore
-      if: always()
-      run: |
-        if command -v shred >/dev/null 2>&1; then
-          shred -u app/release.keystore || true
-        else
-          rm -f app/release.keystore
-        fi
-        echo "Keystore removed"
+      - name: 安全清理签名证书
+        if: always()
+        run: |
+          if command -v shred >/dev/null 2>&1; then
+            shred -u app/release.keystore || true
+          else
+            rm -f app/release.keystore
+          fi
+          echo "签名证书已移除"
 
-    - name: Extract version info
-      id: version
-      run: |
-        VERSION_NAME=$(grep 'versionName' app/build.gradle.kts | head -1 | sed -E 's/.*"(.*)".*/\1/')
-        VERSION_CODE=$(grep 'versionCode' app/build.gradle.kts | head -1 | sed -E 's/.*=\s*([0-9]+).*/\1/')
-        echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
-        echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
+      - name: 读取版本信息
+        id: version
+        run: |
+          VERSION_NAME=$(grep 'versionName' app/build.gradle.kts | head -1 | sed -E 's/.*"(.*)".*/\1/')
+          VERSION_CODE=$(grep 'versionCode' app/build.gradle.kts | head -1 | sed -E 's/.*=\s*([0-9]+).*/\1/')
+          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
 
-    - name: Rename APK
-      run: |
-        mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/LuminCore-v${{ steps.version.outputs.version_name }}-${{ steps.version.outputs.version_code }}.apk
+      - name: 重命名 APK
+        run: |
+          mv app/build/outputs/apk/release/app-release.apk \
+             app/build/outputs/apk/release/LuminCore-v${{ steps.version.outputs.version_name }}-${{ steps.version.outputs.version_code }}.apk
 
-    - name: Check if tag exists
-      id: check_tag
-      run: |
-        TAG="v${{ steps.version.outputs.version_name }}"
-        if git rev-parse "$TAG" >/dev/null 2>&1; then
-          echo "exists=true" >> $GITHUB_OUTPUT
-        else
-          echo "exists=false" >> $GITHUB_OUTPUT
-        fi
+      - name: 校验 APK 签名与证书指纹
+        env:
+          EXPECTED_CERT_SHA256: ${{ secrets.EXPECTED_SIGNING_CERT_SHA256 }}
+        run: |
+          APK=app/build/outputs/apk/release/LuminCore-v${{ steps.version.outputs.version_name }}-${{ steps.version.outputs.version_code }}.apk
 
-    - name: Generate Release Notes
-      id: release_notes
-      run: |
-        PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          echo "🔍 校验 APK 签名..."
+          apksigner verify --print-certs "$APK"
 
-        if [ -z "$PREV_TAG" ]; then
-          COMMITS=$(git log --no-merges --pretty=format:"%s")
-        else
-          COMMITS=$(git log --no-merges --pretty=format:"%s" ${PREV_TAG}..HEAD)
-        fi
+          echo "🔐 提取签名证书 SHA-256..."
+          CERT_SHA256=$(apksigner verify --print-certs "$APK" \
+            | grep "SHA-256 digest:" \
+            | head -1 \
+            | awk '{print $NF}' \
+            | tr '[:upper:]' '[:lower:]')
 
-        COMMITS=$(echo "$COMMITS" | sort -u)
+          echo "预期指纹: $EXPECTED_CERT_SHA256"
+          echo "实际指纹: $CERT_SHA256"
 
-        FEATURES=""
-        FIXES=""
-        CHORES=""
-        OTHERS=""
+          if [ "$CERT_SHA256" != "$EXPECTED_CERT_SHA256" ]; then
+            echo ""
+            echo "❌ 签名证书指纹不匹配！"
+            echo "该 APK 并非使用受信任的 LuminCore 签名。"
+            exit 1
+          fi
 
-        while IFS= read -r line; do
-          case "$line" in
-            feat\(*:*)
-              FEATURES="${FEATURES}- $(echo "$line" | sed -E 's/^(feat|fix|chore)\(([^)]+)\): //')"
-              ;;
-            fix\(*:*)
-              FIXES="${FIXES}- $(echo "$line" | sed -E 's/^(feat|fix|chore)\(([^)]+)\): //')"
-              ;;
-            chore\(*:*)
-              CHORES="${CHORES}- $(echo "$line" | sed -E 's/^(feat|fix|chore)\(([^)]+)\): //')"
-              ;;
-            feat:*)
-              FEATURES="${FEATURES}- $(echo "$line" | sed -E 's/^(feat|fix|chore): //')"
-              ;;
-            fix:*)
-              FIXES="${FIXES}- $(echo "$line" | sed -E 's/^(feat|fix|chore): //')"
-              ;;
-            chore:*)
-              CHORES="${CHORES}- $(echo "$line" | sed -E 's/^(feat|fix|chore): //')"
-              ;;
-            *)
-              OTHERS="${OTHERS}- $line"
-              ;;
-          esac
-        done <<< "$COMMITS"
+          echo "✅ 证书指纹校验通过"
 
-        NOTES=""
-        [ -n "$FEATURES" ] && NOTES="${NOTES}## 🚀 Features\n${FEATURES}\n"
-        [ -n "$FIXES" ]    && NOTES="${NOTES}## 🐛 Bug Fixes\n${FIXES}\n"
-        [ -n "$CHORES" ]   && NOTES="${NOTES}## 🧹 Chores\n${CHORES}\n"
-        [ -n "$OTHERS" ]   && NOTES="${NOTES}## 📌 Others\n${OTHERS}\n"
+      - name: 生成 APK 校验值
+        id: checksum
+        run: |
+          APK=app/build/outputs/apk/release/LuminCore-v${{ steps.version.outputs.version_name }}-${{ steps.version.outputs.version_code }}.apk
 
-        echo "notes<<EOF" >> $GITHUB_OUTPUT
-        echo -e "$NOTES" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
+          echo "sha256=$(sha256sum "$APK" | awk '{print $1}')" >> $GITHUB_OUTPUT
+          echo "sha1=$(sha1sum "$APK" | awk '{print $1}')" >> $GITHUB_OUTPUT
+          echo "md5=$(md5sum "$APK" | awk '{print $1}')" >> $GITHUB_OUTPUT
 
-    - name: Create GitHub Release
-      if: steps.check_tag.outputs.exists == 'false'
-      uses: softprops/action-gh-release@v3
-      with:
-        tag_name: v${{ steps.version.outputs.version_name }}
-        name: Release v${{ steps.version.outputs.version_name }}
-        draft: false
-        prerelease: false
-        body: ${{ steps.release_notes.outputs.notes }}
-        files: |
-          app/build/outputs/apk/release/LuminCore-v${{ steps.version.outputs.version_name }}-${{ steps.version.outputs.version_code }}.apk
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CERT_SHA256=$(apksigner verify --print-certs "$APK" \
+            | grep "SHA-256 digest:" \
+            | head -1 \
+            | awk '{print $NF}')
+
+          echo "cert_sha256=$CERT_SHA256" >> $GITHUB_OUTPUT
+
+      - name: 检查 Tag 是否已存在
+        id: check_tag
+        run: |
+          TAG="v${{ steps.version.outputs.version_name }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 生成 Release 说明（中文映射）
+        id: release_notes
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -z "$PREV_TAG" ]; then
+            COMMITS=$(git log --no-merges --pretty=format:"%s")
+          else
+            COMMITS=$(git log --no-merges --pretty=format:"%s" ${PREV_TAG}..HEAD)
+          fi
+
+          COMMITS=$(echo "$COMMITS" | sort -u)
+
+          FEATURES=""
+          FIXES=""
+          CHORES=""
+          DOCS=""
+          STYLE=""
+          REFACTOR=""
+          TESTS=""
+          CIS=""
+          PERF=""
+          OTHERS=""
+
+          while IFS= read -r line; do
+            case "$line" in
+              feat\(*:*)
+                FEATURES="${FEATURES}- $(echo "$line" | sed -E 's/^(feat|fix|chore|docs|style|refactor|test|ci|perf)\(([^)]+)\): //')"
+                ;;
+              fix\(*:*)
+                FIXES="${FIXES}- $(echo "$line" | sed -E 's/^(feat|fix|chore|docs|style|refactor|test|ci|perf)\(([^)]+)\): //')"
+                ;;
+              chore\(*:*)
+                CHORES="${CHORES}- $(echo "$line" | sed -E 's/^(feat|fix|chore|docs|style|refactor|test|ci|perf)\(([^)]+)\): //')"
+                ;;
+              docs\(*:*)
+                DOCS="${DOCS}- $(echo "$line" | sed -E 's/^(feat|fix|chore|docs|style|refactor|test|ci|perf)\(([^)]+)\): //')"
+                ;;
+              style\(*:*)
+                STYLE="${STYLE}- $(echo "$line" | sed -E 's/^(feat|fix|chore|docs|style|refactor|test|ci|perf)\(([^)]+)\): //')"
+                ;;
+              refactor\(*:*)
+                REFACTOR="${REFACTOR}- $(echo "$line" | sed -E 's/^(feat|fix|chore|docs|style|refactor|test|ci|perf)\(([^)]+)\): //')"
+                ;;
+              test\(*:*)
+                TESTS="${TESTS}- $(echo "$line" | sed -E 's/^(feat|fix|chore|docs|style|refactor|test|ci|perf)\(([^)]+)\): //')"
+                ;;
+              ci\(*:*)
+                CIS="${CIS}- $(echo "$line" | sed -E 's/^(feat|fix|chore|docs|style|refactor|test|ci|perf)\(([^)]+)\): //')"
+                ;;
+              perf\(*:*)
+                PERF="${PERF}- $(echo "$line" | sed -E 's/^(feat|fix|chore|docs|style|refactor|test|ci|perf)\(([^)]+)\): //')"
+                ;;
+              feat:*)
+                FEATURES="${FEATURES}- ${line#*: }"
+                ;;
+              fix:*)
+                FIXES="${FIXES}- ${line#*: }"
+                ;;
+              chore:*)
+                CHORES="${CHORES}- ${line#*: }"
+                ;;
+              docs:*)
+                DOCS="${DOCS}- ${line#*: }"
+                ;;
+              style:*)
+                STYLE="${STYLE}- ${line#*: }"
+                ;;
+              refactor:*)
+                REFACTOR="${REFACTOR}- ${line#*: }"
+                ;;
+              test:*)
+                TESTS="${TESTS}- ${line#*: }"
+                ;;
+              ci:*)
+                CIS="${CIS}- ${line#*: }"
+                ;;
+              perf:*)
+                PERF="${PERF}- ${line#*: }"
+                ;;
+              *)
+                OTHERS="${OTHERS}- $line"
+                ;;
+            esac
+          done <<< "$COMMITS"
+
+          NOTES=""
+          [ -n "$FEATURES" ] && NOTES="${NOTES}## 🚀 新功能\n${FEATURES}\n"
+          [ -n "$FIXES" ]    && NOTES="${NOTES}## 🐛 问题修复\n${FIXES}\n"
+          [ -n "$DOCS" ]     && NOTES="${NOTES}## 📝 文档\n${DOCS}\n"
+          [ -n "$STYLE" ]    && NOTES="${NOTES}## 💄 样式\n${STYLE}\n"
+          [ -n "$REFACTOR" ] && NOTES="${NOTES}## ♻️ 重构\n${REFACTOR}\n"
+          [ -n "$PERF" ]     && NOTES="${NOTES}## ⚡ 性能优化\n${PERF}\n"
+          [ -n "$TESTS" ]    && NOTES="${NOTES}## ✅ 测试\n${TESTS}\n"
+          [ -n "$CIS" ]      && NOTES="${NOTES}## 🔧 CI/CD\n${CIS}\n"
+          [ -n "$CHORES" ]   && NOTES="${NOTES}## 🧹 杂务\n${CHORES}\n"
+          [ -n "$OTHERS" ]   && NOTES="${NOTES}## 📌 其他\n${OTHERS}\n"
+
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: 创建 GitHub Release
+        if: steps.check_tag.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: v${{ steps.version.outputs.version_name }}
+          name: Release v${{ steps.version.outputs.version_name }}
+          draft: false
+          prerelease: false
+          body: |
+            ${{ steps.release_notes.outputs.notes }}
+
+            ---
+
+            ## 🔐 APK 签名与完整性校验
+
+            | 项目 | 值 |
+            |----|----|
+            | **签名别名** | `LuminCore` |
+            | **证书持有者** | `CN=qixiaoxin, L=Shanghai, C=CN` |
+            | **证书 SHA-256** | `${{ steps.checksum.outputs.cert_sha256 }}` |
+            | **APK SHA-256** | `${{ steps.checksum.outputs.sha256 }}` |
+
+            ✅ 已启用证书指纹强校验
+            ✅ 证书有效期至 2126-02-17
+            ✅ CI 将拒绝任何非受信任签名
+          files: |
+            app/build/outputs/apk/release/LuminCore-v${{ steps.version.outputs.version_name }}-${{ steps.version.outputs.version_code }}.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
