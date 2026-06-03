@@ -141,7 +141,7 @@ jobs:
             echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: 生成 Release 说明（中文映射）
+      - name: 生成 Release 说明（仅用户可见变更）
         id: release_notes
         run: |
           PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
@@ -156,43 +156,14 @@ jobs:
 
           FEATURES=""
           FIXES=""
-          CHORES=""
-          DOCS=""
-          STYLE=""
-          REFACTOR=""
-          TESTS=""
-          CIS=""
-          PERF=""
-          OTHERS=""
 
           while IFS= read -r line; do
             case "$line" in
               feat\(*:*)
-                FEATURES="${FEATURES}- $(echo "$line" | sed -E 's/^(feat|fix|chore|docs|style|refactor|test|ci|perf)\(([^)]+)\): //')"
+                FEATURES="${FEATURES}- $(echo "$line" | sed -E 's/^feat\(([^)]+)\): //')"
                 ;;
               fix\(*:*)
-                FIXES="${FIXES}- $(echo "$line" | sed -E 's/^(feat|fix|chore|docs|style|refactor|test|ci|perf)\(([^)]+)\): //')"
-                ;;
-              chore\(*:*)
-                CHORES="${CHORES}- $(echo "$line" | sed -E 's/^(feat|fix|chore|docs|style|refactor|test|ci|perf)\(([^)]+)\): //')"
-                ;;
-              docs\(*:*)
-                DOCS="${DOCS}- $(echo "$line" | sed -E 's/^(feat|fix|chore|docs|style|refactor|test|ci|perf)\(([^)]+)\): //')"
-                ;;
-              style\(*:*)
-                STYLE="${STYLE}- $(echo "$line" | sed -E 's/^(feat|fix|chore|docs|style|refactor|test|ci|perf)\(([^)]+)\): //')"
-                ;;
-              refactor\(*:*)
-                REFACTOR="${REFACTOR}- $(echo "$line" | sed -E 's/^(feat|fix|chore|docs|style|refactor|test|ci|perf)\(([^)]+)\): //')"
-                ;;
-              test\(*:*)
-                TESTS="${TESTS}- $(echo "$line" | sed -E 's/^(feat|fix|chore|docs|style|refactor|test|ci|perf)\(([^)]+)\): //')"
-                ;;
-              ci\(*:*)
-                CIS="${CIS}- $(echo "$line" | sed -E 's/^(feat|fix|chore|docs|style|refactor|test|ci|perf)\(([^)]+)\): //')"
-                ;;
-              perf\(*:*)
-                PERF="${PERF}- $(echo "$line" | sed -E 's/^(feat|fix|chore|docs|style|refactor|test|ci|perf)\(([^)]+)\): //')"
+                FIXES="${FIXES}- $(echo "$line" | sed -E 's/^fix\(([^)]+)\): //')"
                 ;;
               feat:*)
                 FEATURES="${FEATURES}- ${line#*: }"
@@ -200,44 +171,20 @@ jobs:
               fix:*)
                 FIXES="${FIXES}- ${line#*: }"
                 ;;
-              chore:*)
-                CHORES="${CHORES}- ${line#*: }"
-                ;;
-              docs:*)
-                DOCS="${DOCS}- ${line#*: }"
-                ;;
-              style:*)
-                STYLE="${STYLE}- ${line#*: }"
-                ;;
-              refactor:*)
-                REFACTOR="${REFACTOR}- ${line#*: }"
-                ;;
-              test:*)
-                TESTS="${TESTS}- ${line#*: }"
-                ;;
-              ci:*)
-                CIS="${CIS}- ${line#*: }"
-                ;;
-              perf:*)
-                PERF="${PERF}- ${line#*: }"
-                ;;
               *)
-                OTHERS="${OTHERS}- $line"
+                # 忽略 chore/docs/refactor/ci/perf/test/style 等内部变更
                 ;;
             esac
           done <<< "$COMMITS"
 
           NOTES=""
-          [ -n "$FEATURES" ] && NOTES="${NOTES}## 🚀 新功能\n${FEATURES}\n"
-          [ -n "$FIXES" ]    && NOTES="${NOTES}## 🐛 问题修复\n${FIXES}\n"
-          [ -n "$DOCS" ]     && NOTES="${NOTES}## 📝 文档\n${DOCS}\n"
-          [ -n "$STYLE" ]    && NOTES="${NOTES}## 💄 样式\n${STYLE}\n"
-          [ -n "$REFACTOR" ] && NOTES="${NOTES}## ♻️ 重构\n${REFACTOR}\n"
-          [ -n "$PERF" ]     && NOTES="${NOTES}## ⚡ 性能优化\n${PERF}\n"
-          [ -n "$TESTS" ]    && NOTES="${NOTES}## ✅ 测试\n${TESTS}\n"
-          [ -n "$CIS" ]      && NOTES="${NOTES}## 🔧 CI/CD\n${CIS}\n"
-          [ -n "$CHORES" ]   && NOTES="${NOTES}## 🧹 杂务\n${CHORES}\n"
-          [ -n "$OTHERS" ]   && NOTES="${NOTES}## 📌 其他\n${OTHERS}\n"
+
+          if [ -n "$FEATURES" ] || [ -n "$FIXES" ]; then
+            [ -n "$FEATURES" ] && NOTES="${NOTES}## 🚀 新功能\n${FEATURES}\n"
+            [ -n "$FIXES" ]    && NOTES="${NOTES}## 🐛 问题修复\n${FIXES}\n"
+          else
+            NOTES="## 🔧 内部优化\n- 提升稳定性与性能\n"
+          fi
 
           echo "notes<<EOF" >> $GITHUB_OUTPUT
           echo -e "$NOTES" >> $GITHUB_OUTPUT
