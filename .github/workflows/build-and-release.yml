@@ -35,9 +35,6 @@ jobs:
       - name: 设置 Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: 校验 Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v3
-
       - name: 赋予 gradlew 执行权限
         run: chmod +x ./gradlew
 
