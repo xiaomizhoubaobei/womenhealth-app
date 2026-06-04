@@ -156,19 +156,6 @@ env:
 # ------------------------------------------
 main:
   push:
-    - name: push-build
-      # 从密钥仓库导入敏感配置（仅在 main 分支构建时导入）
-      imports:
-        - https://cnb.cool/XMZZUZHI/key/-/blob/main/Android.yml
-      ifModify:
-        # 触发构建的文件路径
-        - 'app/src/**'
-        - 'app/build.gradle*'
-        - 'gradle.properties'
-        - 'gradle/**'
-      docker: *docker_build_template
-      stages: *android_build_stages
-
     # 同步 main 分支到 GitHub 仓库
     - name: sync-to-github
       services:
@@ -187,6 +174,33 @@ main:
             git_user: ${GIT_USERNAME}
             git_email: ${GIT_EMAIL}
             force: true
+
+  # PR 构建测试（向 main 提交 PR 时触发，验证编译是否通过）
+  pull_request:
+    - name: pr-build-test
+      imports:
+        - https://cnb.cool/XMZZUZHI/key/-/blob/main/Android.yml
+      docker: *docker_build_template
+      stages:
+        - name: Make gradlew executable
+          script: chmod +x ./gradlew
+
+        - name: Download release keystore
+          script: |
+            curl -o app/release.keystore https://cnb-1329111128.cos.ap-guangzhou.myqcloud.com/release.keystore
+            echo "release.keystore 下载完成"
+
+        - name: Build APK
+          script: ./gradlew assembleRelease
+
+        - name: Cleanup sensitive files
+          script: |
+            if command -v shred >/dev/null 2>&1; then
+              shred -u app/release.keystore 2>/dev/null || true
+            else
+              rm -f app/release.keystore
+            fi
+            echo "Keystore securely removed from workspace"
 
   # 手动触发构建（web_trigger，通过 .cnb/web_trigger.yml 按钮触发）
   web_trigger_build_apk:
