@@ -94,6 +94,8 @@ jobs:
               yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "build-tools;34.0.0"
               BUILD_TOOLS="$ANDROID_HOME/build-tools/34.0.0"
             fi
+            # GITHUB_PATH 仅影响后续步骤，当前步骤需同时 export PATH
+            export PATH="$BUILD_TOOLS:$PATH"
             echo "$BUILD_TOOLS" >> "$GITHUB_PATH"
             echo "已添加 build-tools 到 PATH: $BUILD_TOOLS"
           fi
