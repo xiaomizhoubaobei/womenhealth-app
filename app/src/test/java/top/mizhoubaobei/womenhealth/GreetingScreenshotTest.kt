@@ -2,7 +2,7 @@ package top.mizhoubaobei.womenhealth
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
-import top.mizhoubaobei.womenhealth.ui.theme.MyApplicationTheme
+import top.mizhoubaobei.womenhealth.ui.theme.LuminCoreTheme
 import com.github.takahirom.roborazzi.RobolectricDeviceQualifiers
 import com.github.takahirom.roborazzi.captureRoboImage
 import org.junit.Rule
@@ -21,7 +21,7 @@ class GreetingScreenshotTest {
 
   @Test
   fun greeting_screenshot() {
-    composeTestRule.setContent { MyApplicationTheme { AppHeaderBanner() } }
+    composeTestRule.setContent { LuminCoreTheme { AppHeaderBanner() } }
 
     composeTestRule.onRoot().captureRoboImage(filePath = "src/test/screenshots/greeting.png")
   }

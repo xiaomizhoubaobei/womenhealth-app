@@ -48,7 +48,7 @@ import top.mizhoubaobei.womenhealth.ui.components.BbtWeightTrackerCard
 import top.mizhoubaobei.womenhealth.ui.components.CycleEncyclopediaCard
 import top.mizhoubaobei.womenhealth.ui.components.NextPeriodPredictionCard
 import top.mizhoubaobei.womenhealth.ui.components.CycleTrendChartCard
-import top.mizhoubaobei.womenhealth.ui.theme.MyApplicationTheme
+import top.mizhoubaobei.womenhealth.ui.theme.LuminCoreTheme
 import top.mizhoubaobei.womenhealth.ui.viewmodel.PeriodViewModel
 import top.mizhoubaobei.womenhealth.ui.viewmodel.PeriodViewModelFactory
 import java.time.LocalDate
@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
         val viewModel = ViewModelProvider(this, factory)[PeriodViewModel::class.java]
 
         setContent {
-            MyApplicationTheme {
+            LuminCoreTheme {
                 val records by viewModel.records.collectAsStateWithLifecycle()
                 val analysis by viewModel.analysis.collectAsStateWithLifecycle()
                 val aiReportState by viewModel.aiReportState.collectAsStateWithLifecycle()
