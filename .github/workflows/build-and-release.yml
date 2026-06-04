@@ -84,6 +84,21 @@ jobs:
           mv app/build/outputs/apk/release/app-release.apk \
              app/build/outputs/apk/release/LuminCore-v${{ steps.version.outputs.version_name }}-${{ steps.version.outputs.version_code }}.apk
 
+      - name: 确保 apksigner 可用
+        run: |
+          # 将 Android SDK build-tools 目录添加到 PATH，确保 apksigner 可用
+          if ! command -v apksigner &>/dev/null; then
+            BUILD_TOOLS=$(ls -d "$ANDROID_HOME"/build-tools/*/apksigner 2>/dev/null | head -1 | xargs -r dirname)
+            if [ -z "$BUILD_TOOLS" ]; then
+              echo "未找到预装的 build-tools，正在安装..."
+              yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "build-tools;34.0.0"
+              BUILD_TOOLS="$ANDROID_HOME/build-tools/34.0.0"
+            fi
+            echo "$BUILD_TOOLS" >> "$GITHUB_PATH"
+            echo "已添加 build-tools 到 PATH: $BUILD_TOOLS"
+          fi
+          apksigner --version && echo "✅ apksigner 已就绪"
+
       - name: 校验 APK 签名与证书指纹
         env:
           EXPECTED_CERT_SHA256: ${{ secrets.EXPECTED_SIGNING_CERT_SHA256 }}
