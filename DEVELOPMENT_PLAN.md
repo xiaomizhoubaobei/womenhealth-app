@@ -1,4 +1,4 @@
-# LuminCore 健康助手 - 功能扩展开发计划
+# LuminCore - 功能扩展开发计划
 
 ![版本](https://img.shields.io/badge/当前版本-2.0.0-brightgreen)
 ![平台](https://img.shields.io/badge/平台-Android-blue)

@@ -1,6 +1,6 @@
-# LuminCore 健康助手 - 项目文档总览
+# LuminCore - 项目文档总览
 
-> 📋 **文档导航**：本文档汇总了LuminCore健康助手项目的所有开发文档、计划文档和技术规范，为开发团队提供一站式文档访问入口。
+> 📋 **文档导航**：本文档汇总了 LuminCore 项目的所有开发文档、计划文档和技术规范，为开发团队提供一站式文档访问入口。
 
 ![项目状态](https://img.shields.io/badge/项目状态-活跃开发中-success)
 ![文档版本](https://img.shields.io/badge/文档版本-2.0-brightgreen)

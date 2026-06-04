@@ -50,7 +50,7 @@
 ### 提交代码
 
 1. 首先，在GitHub上Fork本仓库
-2. 克隆您的Fork到本地：`git clone https://github.com/您的用户名/womenhealth.git`
+2. 克隆您的Fork到本地：`git clone https://github.com/您的用户名/LuminCore.git`
 3. 创建一个新分支：`git checkout -b feature/your-feature-name`
 4. 进行您的更改
 5. 提交您的更改：`git commit -m "添加新功能：功能描述"`

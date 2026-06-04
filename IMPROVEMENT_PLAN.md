@@ -1,4 +1,4 @@
-# LuminCore 健康助手 - 项目改进计划
+# LuminCore - 项目改进计划
 
 ![版本](https://img.shields.io/badge/版本-1.0.0-brightgreen)
 ![平台](https://img.shields.io/badge/平台-Android-blue)

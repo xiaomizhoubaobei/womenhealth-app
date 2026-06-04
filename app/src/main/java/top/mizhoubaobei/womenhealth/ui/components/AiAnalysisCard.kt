@@ -77,7 +77,7 @@ fun AiAnalysisCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "AI 智能女性健康管理分析",
+                    text = "LuminCore 智能健康管理分析",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -467,7 +467,7 @@ fun AiAnalysisCard(
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "健康提示与安全警告：此健康助手和 AI 特征报告由人工智能语言模型生成，旨在提供舒适暖宫与保健指导作为原型演示，不能作为临床医学诊断、用药或重大手术的判断依据。如有严重或剧烈疼痛，请务必咨询专业妇科医院医师。原型内置演示 API Key 受到本安全客户端限制保护，请勿通过公共渠道扩散以符合审计安全规范。",
+                        text = "健康提示与安全警告：此 AI 健康分析和特征报告由人工智能语言模型生成，旨在提供舒适暖宫与保健指导作为原型演示，不能作为临床医学诊断、用药或重大手术的判断依据。如有严重或剧烈疼痛，请务必咨询专业妇科医院医师。原型内置演示 API Key 受到本安全客户端限制保护，请勿通过公共渠道扩散以符合审计安全规范。",
                         fontSize = 9.sp,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f),
                         lineHeight = 13.sp,
