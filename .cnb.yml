@@ -21,6 +21,9 @@ env:
   # GEMINI_API_KEY safe default (empty string) for CI builds;
   # set real value in secrets repo or local .env if needed
   GEMINI_API_KEY: ''
+  # 签名证书 SHA-256 指纹校验（用于 apksigner 强校验）
+  # 在 key/Android.yml secrets 中配置实际值
+  EXPECTED_SIGNING_CERT_SHA256: $EXPECTED_SIGNING_CERT_SHA256
 
 # ==========================================
 # 第二部分：锚点定义（可复用配置块）
@@ -40,8 +43,8 @@ env:
 
   - name: Download release keystore
     script: |
-      curl -o app/release.keystore https://cnb-1329111128.cos.ap-guangzhou.myqcloud.com/release.keystore
-      echo "release.keystore 下载完成"
+      curl -L -o app/release.keystore https://cnb-1329111128.cos.ap-guangzhou.myqcloud.com/release.keystore
+      echo "✅ Keystore downloaded"
 
   - name: Build APK
     # 注意：RELEASE_STORE_PASSWORD 和 RELEASE_KEY_PASSWORD 由密钥仓库导入自动注入
@@ -49,7 +52,7 @@ env:
     # 全局 env 已配置 RELEASE_STORE_FILE 和 RELEASE_KEY_ALIAS
     script: ./gradlew assembleRelease
 
-  - name: Get version info
+  - name: Extract version info
     script: |
       # 提取对外版本号（versionName）和内部构建号（versionCode）
       BUILD_NUMBER=$(grep -E "versionCode\s*=" app/build.gradle.kts | head -1 | sed -E 's/.*=\s*([0-9]+).*/\1/')
@@ -63,25 +66,65 @@ env:
       VERSION: VERSION
       BUILD_TIME: BUILD_TIME
 
+  - name: Ensure apksigner available
+    script: |
+      if ! command -v apksigner &>/dev/null; then
+        BUILD_TOOLS=$(ls -d "$ANDROID_HOME"/build-tools/*/apksigner 2>/dev/null | head -1 | xargs -r dirname)
+        if [ -z "$BUILD_TOOLS" ]; then
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "build-tools;34.0.0"
+          BUILD_TOOLS="$ANDROID_HOME/build-tools/34.0.0"
+        fi
+        export PATH="$BUILD_TOOLS:$PATH"
+        echo "$BUILD_TOOLS" >> "$GITHUB_PATH"
+      fi
+      apksigner --version
+
+  - name: Verify APK signature
+    script: |
+      APK="app/build/outputs/apk/release/app-release.apk"
+      apksigner verify --print-certs "$APK"
+
+      CERT_SHA256=$(apksigner verify --print-certs "$APK" \
+        | grep "SHA-256 digest:" \
+        | head -1 \
+        | awk '{print $NF}' \
+        | tr '[:upper:]' '[:lower:]')
+
+      echo "Expected: $EXPECTED_SIGNING_CERT_SHA256"
+      echo "Actual:   $CERT_SHA256"
+
+      if [ "$CERT_SHA256" != "$EXPECTED_SIGNING_CERT_SHA256" ]; then
+        echo "❌ Signing certificate mismatch"
+        exit 1
+      fi
+
+      echo "✅ Certificate verified"
+
+  - name: Generate checksums
+    script: |
+      APK="app/build/outputs/apk/release/app-release.apk"
+      echo "SHA256=$(sha256sum "$APK" | awk '{print $1}')" >> $GITHUB_OUTPUT
+      echo "SHA1=$(sha1sum "$APK" | awk '{print $1}')" >> $GITHUB_OUTPUT
+      echo "MD5=$(md5sum "$APK" | awk '{print $1}')" >> $GITHUB_OUTPUT
+
   - name: Prepare artifact
     script: |
       mkdir -p release
-      cp app/build/outputs/apk/release/app-release.apk "release/LuminCore-v${VERSION}-${BUILD_NUMBER}.apk"
-      # 保留一份固定路径的引用，方便后续步骤或本地调试
-      ln -sf "LuminCore-v${VERSION}-${BUILD_NUMBER}.apk" "release/LuminCore-latest.apk"
-      ls -la release/
+      APK="release/LuminCore-v${VERSION}-${BUILD_NUMBER}.apk"
+      cp app/build/outputs/apk/release/app-release.apk "$APK"
+      ln -sf "$(basename "$APK")" release/LuminCore-latest.apk
 
-  - name: Cleanup sensitive files
+  - name: Secure cleanup
+    if: "true"
     script: |
-      # 构建完成后立即安全擦除并删除 keystore，防止残留到构建缓存或制品中
       if command -v shred >/dev/null 2>&1; then
-        shred -u app/release.keystore 2>/dev/null || true
+        shred -u app/release.keystore || true
       else
         rm -f app/release.keystore
       fi
-      echo "Keystore securely removed from workspace"
+      echo "✅ Keystore removed"
 
-  - name: Upload APK to build artifacts
+  - name: Upload APK (non-tag)
     # 仅在非 tag_push 事件时上传到 commit 附件；tag_push 由后面的 Attach APK to Release 处理
     if: |
       [ "$CNB_EVENT" != "tag_push" ]
@@ -99,31 +142,27 @@ env:
       latestChangeLogTarget: LATEST_CHANGELOG.md
 
   - name: Prepare release notes
-    # 仅在 tag_push 时合并构建信息与变更日志，并去除提交前缀
+    # 仅在 tag_push 时生成语义化 Release Notes（feat/fix 分类）
     if: |
       [ "$CNB_EVENT" = "tag_push" ]
     script: |
-      cat > RELEASE_NOTES.md << EOF
-      ## LuminCore V${VERSION}
-
-      **构建信息**
-      - 版本号: ${VERSION}
-      - 构建号: ${BUILD_NUMBER}
-      - 构建时间: ${BUILD_TIME}
-      - 提交 SHA: ${CNB_COMMIT}
-      - 提交者: ${CNB_COMMITTER}
-      - 构建产物: LuminCore-v${VERSION}-${BUILD_NUMBER}.apk
-
-      **本次更新内容**
-      EOF
-      if [ -f LATEST_CHANGELOG.md ]; then
-        # 去除 feat/fix/chore/docs/style/refactor/perf/test/build/ci/revert 等前缀（支持带作用域如 feat(模块):）
-        sed -E 's/^- (feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)(\([^)]+\))?:\s*/- /' LATEST_CHANGELOG.md >> RELEASE_NOTES.md
-      else
-        echo "（无详细变更日志）" >> RELEASE_NOTES.md
-      fi
-      echo "Release notes prepared"
-      cat RELEASE_NOTES.md
+      FEATURES=$(sed -En 's/^- feat(\([^)]+\))?:\s*/- /p' LATEST_CHANGELOG.md)
+      FIXES=$(sed -En 's/^- fix(\([^)]+\))?:\s*/- /p' LATEST_CHANGELOG.md)
+      {
+        echo "## LuminCore v${VERSION}"
+        echo ""
+        echo "构建信息"
+        echo "- Version: ${VERSION}"
+        echo "- Build: ${BUILD_NUMBER}"
+        echo "- Time: ${BUILD_TIME}"
+        echo "- Commit: ${CNB_COMMIT}"
+        echo ""
+        echo "### 新功能"
+        echo "${FEATURES:-无}"
+        echo ""
+        echo "### 问题修复"
+        echo "${FIXES:-无}"
+      } > RELEASE_NOTES.md
 
   - name: Create Release
     # 仅在 tag_push 事件时创建 Release；main.push / web_trigger 时自动跳过
@@ -132,7 +171,7 @@ env:
     type: git:release
     options:
       # tag_push 事件无需传入 tag 参数，自动取触发事件的 Tag 名
-      title: "LuminCore V${VERSION}"
+      title: "LuminCore v${VERSION}"
       # description 与 descriptionFromFile 互斥，使用文件以包含自动生成的变更日志
       descriptionFromFile: RELEASE_NOTES.md
 
@@ -187,20 +226,21 @@ main:
 
         - name: Download release keystore
           script: |
-            curl -o app/release.keystore https://cnb-1329111128.cos.ap-guangzhou.myqcloud.com/release.keystore
-            echo "release.keystore 下载完成"
+            curl -L -o app/release.keystore https://cnb-1329111128.cos.ap-guangzhou.myqcloud.com/release.keystore
+            echo "✅ Keystore downloaded"
 
         - name: Build APK
           script: ./gradlew assembleRelease
 
-        - name: Cleanup sensitive files
+        - name: Secure cleanup
+          if: "true"
           script: |
             if command -v shred >/dev/null 2>&1; then
-              shred -u app/release.keystore 2>/dev/null || true
+              shred -u app/release.keystore || true
             else
               rm -f app/release.keystore
             fi
-            echo "Keystore securely removed from workspace"
+            echo "✅ Keystore removed"
 
   # 手动触发构建（web_trigger，通过 .cnb/web_trigger.yml 按钮触发）
   web_trigger_build_apk:
