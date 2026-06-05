@@ -214,34 +214,6 @@ main:
             git_email: ${GIT_EMAIL}
             force: true
 
-  # PR 构建测试（向 main 提交 PR 时触发，验证编译是否通过）
-  pull_request:
-    - name: pr-build-test
-      imports:
-        - https://cnb.cool/XMZZUZHI/key/-/blob/main/Android.yml
-      docker: *docker_build_template
-      stages:
-        - name: Make gradlew executable
-          script: chmod +x ./gradlew
-
-        - name: Download release keystore
-          script: |
-            curl -L -o app/release.keystore https://cnb-1329111128.cos.ap-guangzhou.myqcloud.com/release.keystore
-            echo "✅ Keystore downloaded"
-
-        - name: Build APK
-          script: ./gradlew assembleRelease
-
-        - name: Secure cleanup
-          if: "true"
-          script: |
-            if command -v shred >/dev/null 2>&1; then
-              shred -u app/release.keystore || true
-            else
-              rm -f app/release.keystore
-            fi
-            echo "✅ Keystore removed"
-
   # 手动触发构建（web_trigger，通过 .cnb/web_trigger.yml 按钮触发）
   web_trigger_build_apk:
     - name: manual-build-apk
