@@ -36,7 +36,7 @@ jobs:
         run: git remote add gitcode git@gitcode.com:xiaomizhou/womenhealth-app.git
 
       - name: Push to Gitcode
-        run: git push gitcode main -f
+        run: git push gitcode main
 
   sync-to-gitee:
     runs-on: ubuntu-latest
@@ -69,5 +69,5 @@ jobs:
         run: git remote add gitee git@gitee.com:qinjielove/womenhealth-app.git
 
       - name: Push to Gitee
-        run: git push gitee main -f
+        run: git push gitee main
 
