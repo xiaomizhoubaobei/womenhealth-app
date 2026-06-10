@@ -12,6 +12,102 @@
 
 一款专为女性设计的健康追踪应用，帮助用户记录和管理月经周期、身体症状和健康数据。
 
+## 📁 项目目录结构
+
+```
+womenhealth-app-kaifa/
+├── app/                                    # Android 应用模块
+│   ├── build.gradle.kts                    # 应用模块构建脚本
+│   ├── proguard-rules.pro                  # ProGuard 混淆规则
+│   ├── google-services.json                # Google 服务配置
+│   ├── agconnect-services.json             # 华为 AGC 服务配置
+│   └── src/
+│       ├── main/
+│       │   ├── AndroidManifest.xml         # 应用清单文件
+│       │   ├── java/top/mizhoubaobei/womenhealth/
+│       │   │   ├── MainActivity.kt         # 主 Activity
+│       │   │   ├── data/                   # 数据层
+│       │   │   │   ├── api/
+│       │   │   │   │   └── GeminiApi.kt    # Gemini AI 接口
+│       │   │   │   ├── database/
+│       │   │   │   │   ├── AppDatabase.kt  # Room 数据库定义
+│       │   │   │   │   ├── PeriodDao.kt    # 月经记录 DAO
+│       │   │   │   │   └── PeriodRecord.kt # 月经记录实体
+│       │   │   │   └── repository/
+│       │   │   │       └── PeriodRepository.kt  # 数据仓库
+│       │   │   └── ui/                     # UI 层
+│       │   │       ├── components/         # UI 组件
+│       │   │       │   ├── AddRecordSheet.kt
+│       │   │       │   ├── AiAnalysisCard.kt
+│       │   │       │   ├── BbtWeightTrackerCard.kt
+│       │   │       │   ├── CalendarSection.kt
+│       │   │       │   ├── CycleAnalyticsCard.kt
+│       │   │       │   ├── CycleEncyclopediaCard.kt
+│       │   │       │   ├── CycleTrendChartCard.kt
+│       │   │       │   ├── CycleWheel.kt
+│       │   │       │   ├── FuturePredictionsCard.kt
+│       │   │       │   ├── HealingGuideCard.kt
+│       │   │       │   ├── MythBusterCard.kt
+│       │   │       │   ├── NextPeriodPredictionCard.kt
+│       │   │       │   └── WellnessTrackerCard.kt
+│       │   │       ├── theme/              # 主题配置
+│       │   │       │   ├── Color.kt
+│       │   │       │   ├── Theme.kt
+│       │   │       │   └── Type.kt
+│       │   │       └── viewmodel/          # ViewModel 层
+│       │   │           └── PeriodViewModel.kt
+│       │   └── res/                        # 资源文件
+│       │       ├── drawable/               # 矢量图资源
+│       │       ├── mipmap-*/               # 应用图标（多分辨率）
+│       │       ├── values/                 # 字符串、颜色、主题
+│       │       └── xml/                    # 备份规则配置
+│       ├── test/                           # 单元测试
+│       │   ├── java/top/mizhoubaobei/womenhealth/
+│       │   │   ├── ExampleUnitTest.kt
+│       │   │   ├── ExampleRobolectricTest.kt
+│       │   │   └── GreetingScreenshotTest.kt
+│       │   └── screenshots/                # 截图测试资源
+│       └── androidTest/                    # 仪器测试
+│           └── java/top/mizhoubaobei/womenhealth/
+│               └── ExampleInstrumentedTest.kt
+├── gradle/                                 # Gradle 配置
+│   ├── libs.versions.toml                  # 版本目录
+│   └── wrapper/                            # Gradle Wrapper
+├── plans/                                  # 开发计划文档
+│   ├── WOMEN_HEALTH_APP_DEVELOPMENT_PLAN.md
+│   ├── HOME_PAGE_PLAN.md
+│   ├── MENSTRUAL_MANAGEMENT_PAGE_PLAN.md
+│   ├── PREGNANCY_MANAGEMENT_PAGE_PLAN.md
+│   ├── AI_HEALTH_ASSISTANT_PLAN.md
+│   ├── CLOUD_SYNC_ARCHITECTURE_PLAN.md
+│   ├── COMMUNITY_FEATURE_PLAN.md
+│   ├── DATA_VISUALIZATION_PLAN.md
+│   ├── SMART_REMINDER_SYSTEM_PLAN.md
+│   └── ... (更多开发计划文档)
+├── .github/                                # GitHub 配置
+│   ├── workflows/                          # CI/CD 工作流
+│   │   ├── build-and-release.yml
+│   │   └── sync-to-coding.yml
+│   ├── ISSUE_TEMPLATE/                     # Issue 模板
+│   └── pull_request_template.md            # PR 模板
+├── .cnb/                                   # CNB 平台配置
+│   └── web_trigger.yml
+├── build.gradle.kts                        # 根项目构建脚本
+├── settings.gradle.kts                     # Gradle 设置
+├── gradle.properties                       # Gradle 属性
+├── gradlew / gradlew.bat                   # Gradle Wrapper 脚本
+├── README.md                               # 项目说明文档
+├── CHANGELOG.md                            # 更新日志
+├── CONTRIBUTING.md                         # 贡献指南
+├── CODE_OF_CONDUCT.md                      # 行为准则
+├── LICENSE                                 # 许可证
+├── SECURITY.md                             # 安全政策
+├── DEVELOPMENT_PLAN.md                     # 开发计划
+├── IMPROVEMENT_PLAN.md                     # 改进计划
+├── CI_CD_SIGNING_CONFIG.md                 # CI/CD 签名配置
+└── local.properties.example                # 本地配置示例
+```
+
 ## 📱 应用概述
 
 LuminCore是一款注重隐私保护的女性健康管理工具，采用纯本地存储方式，无需联网即可使用。应用提供直观的日历视图、智能周期预测和全面的健康数据记录功能，帮助女性更好地了解自己的身体状况，掌握健康规律。通过科学的数据分析，为用户提供个性化的健康洞察和建议。
