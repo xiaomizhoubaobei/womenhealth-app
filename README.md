@@ -1,16 +1,16 @@
 # LuminCore - 健康助手
 
-![版本](https://img.shields.io/badge/版本-1.0.0-brightgreen)
+![版本](https://img.shields.io/badge/版本-0.0.1-brightgreen)
 ![平台](https://img.shields.io/badge/平台-Android-blue)
 ![仓库大小](https://img.shields.io/github/repo-size/xiaomizhoubaobei/womenhealth-app)
 ![提交活动](https://img.shields.io/github/commit-activity/w/xiaomizhoubaobei/womenhealth-app)
 ![语言](https://img.shields.io/badge/语言-Kotlin-orange)
 ![许可证](https://img.shields.io/badge/许可证-自定义许可证-yellow)
-![API](https://img.shields.io/badge/API-26%2B-green)
+![API](https://img.shields.io/badge/API-24%2B-green)
 ![状态](https://img.shields.io/badge/状态-活跃开发中-success)
 ![GitHub last commit](https://img.shields.io/github/last-commit/xiaomizhoubaobei/womenhealth-app)
 
-一款专为女性设计的健康追踪应用，帮助用户记录和管理月经周期、身体症状和健康数据。
+一款专为女性设计的智能健康追踪应用，集成 AI 健康分析与周期预测，帮助用户记录和管理月经周期、身体症状和健康数据。
 
 ## 📁 项目目录结构
 
@@ -25,37 +25,37 @@ womenhealth-app-kaifa/
 │       ├── main/
 │       │   ├── AndroidManifest.xml         # 应用清单文件
 │       │   ├── java/top/mizhoubaobei/womenhealth/
-│       │   │   ├── MainActivity.kt         # 主 Activity
+│       │   │   ├── MainActivity.kt         # 主 Activity（单页架构）
 │       │   │   ├── data/                   # 数据层
 │       │   │   │   ├── api/
-│       │   │   │   │   └── GeminiApi.kt    # Gemini AI 接口
+│       │   │   │   │   └── GeminiApi.kt    # Gemini AI REST API 客户端
 │       │   │   │   ├── database/
 │       │   │   │   │   ├── AppDatabase.kt  # Room 数据库定义
 │       │   │   │   │   ├── PeriodDao.kt    # 月经记录 DAO
 │       │   │   │   │   └── PeriodRecord.kt # 月经记录实体
 │       │   │   │   └── repository/
-│       │   │   │       └── PeriodRepository.kt  # 数据仓库
+│       │   │   │       └── PeriodRepository.kt  # 数据仓库 + 周期分析算法
 │       │   │   └── ui/                     # UI 层
-│       │   │       ├── components/         # UI 组件
-│       │   │       │   ├── AddRecordSheet.kt
-│       │   │       │   ├── AiAnalysisCard.kt
-│       │   │       │   ├── BbtWeightTrackerCard.kt
-│       │   │       │   ├── CalendarSection.kt
-│       │   │       │   ├── CycleAnalyticsCard.kt
-│       │   │       │   ├── CycleEncyclopediaCard.kt
-│       │   │       │   ├── CycleTrendChartCard.kt
-│       │   │       │   ├── CycleWheel.kt
-│       │   │       │   ├── FuturePredictionsCard.kt
-│       │   │       │   ├── HealingGuideCard.kt
-│       │   │       │   ├── MythBusterCard.kt
-│       │   │       │   ├── NextPeriodPredictionCard.kt
-│       │   │       │   └── WellnessTrackerCard.kt
-│       │   │       ├── theme/              # 主题配置
+│       │   │       ├── components/         # Compose UI 组件
+│       │   │       │   ├── AddRecordSheet.kt           # 经期记录表单
+│       │   │       │   ├── AiAnalysisCard.kt           # AI 健康分析卡片
+│       │   │       │   ├── BbtWeightTrackerCard.kt     # 基础体温与体重追踪
+│       │   │       │   ├── CalendarSection.kt          # 生理周期日历
+│       │   │       │   ├── CycleAnalyticsCard.kt       # 周期统计分析仪表盘
+│       │   │       │   ├── CycleEncyclopediaCard.kt    # 生理周期百科
+│       │   │       │   ├── CycleTrendChartCard.kt      # 周期趋势折线图
+│       │   │       │   ├── CycleWheel.kt               # 周期环形进度指示器
+│       │   │       │   ├── FuturePredictionsCard.kt    # 未来三月预测时间线
+│       │   │       │   ├── HealingGuideCard.kt         # 温宫调养方案卡片
+│       │   │       │   ├── MythBusterCard.kt           # 健康误区辟谣轮播
+│       │   │       │   ├── NextPeriodPredictionCard.kt # 下期经期预测看板
+│       │   │       │   └── WellnessTrackerCard.kt      # 每日健康生活追踪
+│       │   │       ├── theme/              # Material3 主题配置
 │       │   │       │   ├── Color.kt
 │       │   │       │   ├── Theme.kt
 │       │   │       │   └── Type.kt
 │       │   │       └── viewmodel/          # ViewModel 层
-│       │   │           └── PeriodViewModel.kt
+│       │   │           └── PeriodViewModel.kt  # 主 ViewModel
 │       │   └── res/                        # 资源文件
 │       │       ├── drawable/               # 矢量图资源
 │       │       ├── mipmap-*/               # 应用图标（多分辨率）
@@ -71,19 +71,9 @@ womenhealth-app-kaifa/
 │           └── java/top/mizhoubaobei/womenhealth/
 │               └── ExampleInstrumentedTest.kt
 ├── gradle/                                 # Gradle 配置
-│   ├── libs.versions.toml                  # 版本目录
+│   ├── libs.versions.toml                  # 版本目录（统一依赖管理）
 │   └── wrapper/                            # Gradle Wrapper
-├── plans/                                  # 开发计划文档
-│   ├── WOMEN_HEALTH_APP_DEVELOPMENT_PLAN.md
-│   ├── HOME_PAGE_PLAN.md
-│   ├── MENSTRUAL_MANAGEMENT_PAGE_PLAN.md
-│   ├── PREGNANCY_MANAGEMENT_PAGE_PLAN.md
-│   ├── AI_HEALTH_ASSISTANT_PLAN.md
-│   ├── CLOUD_SYNC_ARCHITECTURE_PLAN.md
-│   ├── COMMUNITY_FEATURE_PLAN.md
-│   ├── DATA_VISUALIZATION_PLAN.md
-│   ├── SMART_REMINDER_SYSTEM_PLAN.md
-│   └── ... (更多开发计划文档)
+├── plans/                                  # 开发计划文档（40+ 份规划）
 ├── .github/                                # GitHub 配置
 │   ├── workflows/                          # CI/CD 工作流
 │   │   ├── build-and-release.yml
@@ -110,174 +100,206 @@ womenhealth-app-kaifa/
 
 ## 📱 应用概述
 
-LuminCore是一款注重隐私保护的女性健康管理工具，采用纯本地存储方式，无需联网即可使用。应用提供直观的日历视图、智能周期预测和全面的健康数据记录功能，帮助女性更好地了解自己的身体状况，掌握健康规律。通过科学的数据分析，为用户提供个性化的健康洞察和建议。
+LuminCore 是一款注重隐私保护的女性健康管理工具，采用纯本地存储方式，数据不会上传至任何服务器。应用提供直观的日历视图、智能周期预测、AI 健康分析和全面的健康数据记录功能，帮助女性更好地了解自己的身体状况，掌握健康规律。
 
-## ✨ 功能特点
+应用内置**贴心避孕**和**黄金备孕**双模式，根据不同使用场景提供针对性的健康建议和预测分析。
 
-- **月经周期追踪**：记录月经开始和结束日期，自动计算周期长度和规律性
-- **日历视图**：直观展示月经期、排卵期和预测的下次月经日期
-- **症状记录**：追踪身体症状（如头痛、情绪波动、腹痛等）
-- **数据统计**：分析月经周期规律和症状模式，提供个性化健康洞察
-- **快速添加**：便捷的界面，快速记录当天的月经状态和症状
-- **隐私保护**：所有数据本地存储，保障用户隐私安全
-- **智能预测**：基于历史数据预测下次月经日期和排卵期
-- **健康提醒**：月经即将来临、排卵期等重要时间点提醒
-- **数据备份**：支持导出和导入数据，确保数据安全
-- **多主题支持**：提供浅色、深色和自动主题模式
+## ✨ 已实现功能
+
+### 核心追踪
+- **月经周期追踪**：记录月经开始和结束日期、经量等级（极少/较少/正常/较多）
+- **症状记录**：支持 6 种常见症状（痛经、头痛、腹胀、乳房胀痛、粉刺、无症状）
+- **情绪记录**：追踪 6 种情绪状态（平静、敏感、郁闷、开朗、疲惫、焦虑）
+- **备忘录**：为每次记录添加自由文字备注
+- **历史记录管理**：查看和删除所有历史经期记录
+
+### 智能预测与分析
+- **智能周期预测**：基于历史数据计算平均周期长度，预测下次月经日期和排卵期
+- **周期四阶段识别**：自动识别月经期、卵泡期、易孕期（排卵期）、黄体期
+- **下期经期预测看板**：展示预测置信度（初步推测/高精确推算），提供经前准备建议
+- **未来三月预测时间线**：展示未来 3 个月的经期和易孕期预测
+- **周期统计分析仪表盘**：累计记录数、平均行经天数、平均周期跨度、规律度评分、症状/情绪频次排行
+- **周期趋势图**：Canvas 自绘的 6 个月周期长度趋势折线图
+
+### 健康生活追踪
+- **基础体温 (BBT) 追踪**：滑块调节 + 精细步进按钮，7 天体温趋势曲线图
+- **体重追踪**：7 天体重波动趋势曲线图
+- **每日健康日记**：饮水量追踪（8 杯目标）、饮品类型选择（暖宫姜茶/红糖水/益母草饮/温开水）、睡眠质量、保暖感受
+- **温宫调养方案**：温热食疗、艾叶泡足、三阴交穴位按摩，根据当前周期阶段动态推荐
+
+### AI 智能分析
+- **AI 健康报告生成**：调用 Gemini 3.5 Flash 模型，基于历史数据一键生成个性化周期分析报告
+- **AI 在线咨询**：对话式健康问答，推荐提问卡片一键速问
+- **系统提示定制**：AI 角色设定为专业女性生理健康调理助理
+
+### 可视化与交互
+- **周期环形进度指示器**：Canvas 自绘的环形图，四色分段（月经期/卵泡期/易孕期/黄体期），脉冲动画定位当前天数
+- **生理周期日历**：月视图日历，颜色编码标记经期（粉色）、预测期（橙色）、排卵/易孕（紫色），点击查看当日详情
+- **生理周期百科**：各生理阶段的科学知识介绍
+- **健康误区辟谣**：轮播卡片形式的健康知识科普
+
+### 模式切换
+- **贴心避孕模式**：重点提示易孕危险期，提供安全期防护建议
+- **黄金备孕模式**：重点分析排卵日和黄金受孕时间窗，提供叶酸补充和子宫温养建议
 
 ## 💡 应用亮点
 
-- **简洁直观的用户界面**：采用Material Design设计语言，操作简单易上手
-- **多维度健康记录**：不仅记录月经周期，还包括身体症状、情绪变化和生活习惯
-- **个性化分析报告**：根据用户数据生成专属健康报告，帮助了解身体状况
-- **灵活的数据管理**：支持数据导入导出，方便用户备份和迁移
-- **完全离线使用**：无需网络连接，保护用户隐私
-- **科学的预测算法**：结合用户历史数据和统计模型，提供准确的周期预测
-- **全面的症状跟踪**：支持记录30+种常见身体症状和情绪变化
-
-## 📸 应用界面预览
-
-### 主要功能界面
-
-应用采用现代化的Material Design 3设计语言，提供清晰直观的用户界面和流畅的交互体验。主要界面包括日历视图、记录详情、统计分析、快速添加和设置页面等。
-
-### 设计特点
-
-- **一致的设计语言**：遵循Material You设计规范，支持动态主题
-- **直观的色彩编码**：不同颜色标记不同的月经周期阶段
-- **简洁的信息层次**：重要信息突出显示，次要信息适当弱化
-- **流畅的动画过渡**：增强用户操作反馈和界面连贯性
-- **适应性布局**：自适应不同屏幕尺寸和方向
-- **无障碍设计**：支持屏幕阅读器和其他辅助功能
+- **全 Jetpack Compose 架构**：采用声明式 UI，无 XML 布局，流畅的动画过渡
+- **Material Design 3 设计语言**：支持动态主题，统一的圆角卡片风格
+- **Canvas 自绘图表**：体温/体重趋势图、周期环形指示器均为原生 Canvas 绘制，无第三方图表库依赖
+- **完全离线使用**：核心数据本地 Room 数据库存储，无需网络连接
+- **AI 增强分析**：集成 Google Gemini 大模型，提供智能健康洞察
+- **双模式适配**：避孕与备孕场景一键切换，预测和建议随之变化
+- **Edge-to-Edge 全屏显示**：沉浸式 UI 体验
 
 ## 🛠️ 技术架构
 
-- **开发语言**：Kotlin
-- **架构模式**：MVVM (Model-View-ViewModel)
-- **数据存储**：Room 数据库
-- **UI组件**：Material Design 组件
-- **导航**：Navigation Component
-- **异步处理**：Kotlin Coroutines
-- **依赖注入**：Hilt/Dagger
-- **响应式编程**：LiveData/Flow
-- **单元测试**：JUnit, Mockito
-- **UI测试**：Espresso
-- **图表库**：MPAndroidChart
-- **日期处理**：ThreeTenABP (JSR-310)
+### 架构模式
+- **MVVM** (Model-View-ViewModel)
+- **单 Activity 架构**：`MainActivity` + Compose 组件树
+- **响应式数据流**：`StateFlow` + `collectAsStateWithLifecycle`
+
+### 技术栈
+
+| 类别 | 技术 | 版本 |
+|------|------|------|
+| 语言 | Kotlin | 2.2.10 |
+| 构建工具 | Android Gradle Plugin | 9.1.1 |
+| UI 框架 | Jetpack Compose (BOM) | 2024.09.00 |
+| 设计系统 | Material3 | (BOM 管理) |
+| 数据库 | Room | 2.7.0 |
+| 网络层 | Retrofit + OkHttp | 2.12.0 / 4.10.0 |
+| JSON 序列化 | Moshi | 1.15.2 |
+| 异步处理 | Kotlin Coroutines | 1.10.2 |
+| 生命周期 | Lifecycle (ViewModel, Runtime) | 2.8.7 |
+| Activity | Activity Compose | 1.10.1 |
+| Core | AndroidX Core KTX | 1.18.0 |
+| KSP | KSP (注解处理) | 2.3.5 |
+| 密钥管理 | Secrets Gradle Plugin | 2.0.1 |
+| 云服务 | Firebase BOM | 34.12.0 |
+
+### 测试框架
+
+| 框架 | 版本 | 用途 |
+|------|------|------|
+| JUnit | 4.13.2 | 单元测试 |
+| Robolectric | 4.16.1 | Android 环境单元测试 |
+| Roborazzi | 1.59.0 | 截图测试 |
+| Espresso | 3.7.0 | UI 仪器测试 |
+| Coroutines Test | 1.10.2 | 协程测试 |
 
 ## 📱 主要功能模块
 
-### 日历模块
-- 月视图日历展示，支持月份切换和今日快速定位
-- 不同颜色标记月经期、排卵期和预测期
-- 点击日期查看/编辑详细信息
-- 日期详情对话框支持记录月经状态、症状和备注
-- 长按日期可快速标记月经开始/结束
-- 支持周视图和月视图切换
-- 提供月经周期阶段指示器
+### 周期环形指示器
+- Canvas 自绘的环形进度图，四色分段展示月经期、卵泡期、易孕期、黄体期
+- 脉冲动画定位当前周期天数
+- 中央 HUD 显示当前天数、生理阶段和距下次经期天数
 
-### 记录列表模块
-- 展示所有月经记录
-- 添加、编辑和删除记录
-- 按时间排序，支持筛选和搜索
-- 详细展示每次月经的开始日期、结束日期、持续天数和周期长度
-- 支持按月份分组查看
-- 提供记录导出功能
+### 生理周期日历
+- 月视图日历，支持月份切换
+- 颜色编码：粉色标记经期、橙色标记预测期、紫色标记排卵/易孕期
+- 点击日期查看详情卡片（经量、症状、情绪、备注）
+- 图例标注各类颜色含义
 
-### 快速添加模块
-- 一键记录当天状态
-- 选择症状和流量等级（轻、中、重）
-- 添加备注和情绪记录
-- 支持修改日期，补充历史记录
-- 常用症状快速选择
-- 自定义症状添加
+### 下期经期预测看板
+- 大字展示预测来潮日期和倒计时
+- 置信度标签（初步推测/高精确推算）随记录数自动升级
+- 周期转段进度图（Canvas 自绘时间线）
+- 经前贴心备忘清单
+- 模拟日历同步功能
 
-### 统计分析模块
-- 月经周期长度统计
-- 症状频率分析
-- 健康趋势可视化
-- 周期规律性评估
-- 个性化健康建议
-- 月经周期变化趋势图
-- 症状关联性分析
+### AI 智能分析中心
+- **报告模式**：一键生成 Gemini 加持的周期分析报告，支持重新生成
+- **咨询模式**：对话式 AI 问答，推荐提问卡片，消息气泡布局
+- 安全警告提示：AI 生成内容不可作为医学诊断依据
 
-### 设置模块
-- 个人信息设置
-- 提醒设置（月经提醒、排卵期提醒等）
-- 数据备份与恢复
-- 主题和界面定制
-- 隐私设置
-- 应用锁设置
-- 语言选择
+### 基础体温与体重追踪
+- 滑块 + 精细步进按钮（±0.05°C / ±0.2kg）
+- 7 天趋势曲线图（Canvas 自绘贝塞尔曲线 + 渐变填充）
+- 双 Tab 切换（BBT / 体重）
+- 科学小贴士：体温双相分布、体重水钠潴留原理
 
-## 🔍 日期详情对话框
+### 每日健康生活追踪
+- 饮水量进度条（8 杯目标）
+- 饮品类型快速选择（暖宫姜茶/红糖水/益母草饮/温开水）
+- 睡眠质量与保暖感受自评
+- 温宫调养方案：食疗/泡足/穴位按摩打卡，根据周期阶段动态推荐
 
-日期详情对话框是应用的核心功能之一，允许用户查看和编辑特定日期的月经和症状记录：
-
-- **月经状态切换**：一键标记当天是否为月经期
-- **流量选择**：轻、中、重三级流量选择
-- **症状多选**：支持选择多种身体症状
-- **备注功能**：添加文字备注记录特殊情况
-- **日期选择**：可修改日期，方便补充历史记录
-- **情绪记录**：记录当天情绪状态
-- **活动记录**：记录特殊活动（如运动、旅行等）
+### 周期统计分析仪表盘
+- 累计记录数、平均行经天数、平均周期跨度
+- 生理周期规律度评分（标准差算法）
+- 频发症状排行、情绪波动偏好（进度条可视化）
 
 ## 📋 安装要求
 
-- Android 8.0 (API 级别 26) 或更高版本
+- Android 7.0 (API 级别 24) 或更高版本
 - 约 20MB 存储空间
 - 权限需求：
-  - 存储权限（用于数据备份）
-  - 通知权限（用于健康提醒）
-  - 振动权限（用于提醒反馈）
+  - 网络权限（用于 AI 分析功能）
 
 ## 🚀 安装方式
 
-1. **直接下载APK安装**
-   - 从[GitHub Releases](https://github.com/xiaomizhoubaobei/womenhealth-app/releases)下载最新版本
-   - 在Android设备上打开APK文件进行安装
-   - 首次安装需要允许"未知来源"应用安装权限
+### 直接下载 APK 安装
+1. 从 [GitHub Releases](https://github.com/xiaomizhoubaobei/womenhealth-app/releases) 下载最新版本
+2. 在 Android 设备上打开 APK 文件进行安装
+3. 首次安装需要允许"未知来源"应用安装权限
 
-2. **开发者安装**
-   - 克隆仓库：`git clone https://github.com/xiaomizhoubaobei/womenhealth-app.git`
-   - 使用Android Studio打开项目
-   - 点击"Run"按钮在设备或模拟器上安装
+### 开发者安装
+```bash
+# 克隆仓库
+git clone https://github.com/xiaomizhoubaobei/womenhealth-app.git
 
-## 📖 使用指南
+# 使用 Android Studio 打开项目
+# 点击 "Run" 按钮在设备或模拟器上安装
+```
 
-### 首次使用
-- 输入最近一次月经日期和平均周期长度
-- 设置提醒偏好
-- 选择界面主题
-- 完成个人健康信息问卷（可选）
+## 🔧 构建配置
 
-### 日常使用
-- 在日历页面查看月经预测和排卵期
-- 点击日期记录当天状态
-- 使用快速添加功能一键记录
-- 查看统计页面了解健康趋势
+| 配置项 | 值 |
+|--------|-----|
+| compileSdk | 36 |
+| minSdk | 24 |
+| targetSdk | 36 |
+| Java 版本 | 11 |
+| Kotlin 版本 | 2.1.10 |
+| AGP 版本 | 9.1.1 |
+| 应用 ID | `top.mizhoubaobei.womenhealth` |
+| 版本号 | 0.0.1 (versionCode: 1) |
+| 项目名称 | LuminCore |
 
-### 数据管理
-- 在设置中备份/恢复数据
-- 导出健康报告（PDF/CSV格式）
-- 查看统计分析了解身体规律
-- 定期清理过期数据（可选）
+### AI 功能配置
 
-### 高级功能
-- 设置自定义提醒
-- 添加自定义症状
-- 配置数据可视化图表
-- 启用应用锁保护隐私
+AI 健康分析功能需要配置 Gemini API Key：
+
+1. **CI 环境**：通过环境变量 `GEMINI_API_KEY` 注入
+2. **本地开发**：在 `gradle.properties` 中添加 `GEMINI_API_KEY=your_key`
+
+### 签名配置
+
+Release 版本使用以下签名配置（通过 GitHub Secrets 管理）：
+
+| Secret 名称 | 描述 |
+|-------------|------|
+| `RELEASE_STORE_FILE` | Keystore 文件路径 |
+| `RELEASE_STORE_PASSWORD` / `KEYSTORE_PASSWORD` | Keystore 密码 |
+| `RELEASE_KEY_ALIAS` / `KEY_ALIAS` | 密钥别名 |
+| `RELEASE_KEY_PASSWORD` / `KEY_PASSWORD` | 密钥密码 |
+
+签名支持 V1-V4 全版本签名方案。Debug 版本使用项目内置的 `debug.keystore`。
+
+### 环境要求
+
+- JDK 11
+- Android SDK 36
+- Gradle 8.0+
 
 ## 🔒 隐私说明
 
 本应用高度重视用户隐私保护：
-- 所有数据均存储在用户设备本地，不会上传至任何服务器或与第三方共享
+- 所有经期、症状、情绪数据均存储在用户设备本地（Room 数据库），不会上传至任何服务器
 - 不收集用户个人身份信息
-- 支持数据加密存储
-- 可设置应用锁保护隐私
-- 备份文件采用加密格式
-- 不包含任何第三方分析或广告SDK
+- AI 分析功能通过 Google Gemini API 实现，仅发送匿名化的周期统计数据，不包含个人身份信息
+- 支持数据备份与恢复
 
 ## 👩‍💻 开发者信息
 
@@ -292,156 +314,6 @@ LuminCore是一款注重隐私保护的女性健康管理工具，采用纯本�
 - [更新日志](CHANGELOG.md)
 - [贡献指南](CONTRIBUTING.md)
 - [行为准则](CODE_OF_CONDUCT.md)
-
-## GitHub Actions 工作流
-
-本项目配置了以下GitHub Actions工作流：
-
-### 1. Build and Release APK (构建和发布)
-- **触发条件**: Push到master分支或手动触发
-- **功能**:
-  - 构建Release版本APK
-  - 使用签名配置
-  - 自动创建GitHub Release
-  - 上传APK到Release页面
-
-### 2. Sync to Multiple Platforms (多平台同步)
-- 自动同步代码到多个代码托管平台
-
-## GitHub Secrets配置
-
-在仓库设置中配置以下Secrets（如果未配置，将工作流将报错）：
-
-| Secret名称               | 描述         | 默认值 |
-|------------------------|------------|-----|
-| RELEASE_STORE_PASSWORD | Keystore密码 | 无   |
-| RELEASE_KEY_ALIAS      | 密钥别名       | 无   |
-| RELEASE_KEY_PASSWORD   | 密钥密码       | 无   |
-
-**安全建议**: 建议在GitHub Secrets中配置。
-
-## 构建配置
-
-项目使用以下配置：
-- **编译SDK**: 35
-- **最低SDK**: 30
-- **目标SDK**: 35
-- **Java版本**: 11
-- **Kotlin版本**: 与Android Gradle插件兼容
-
-## 签名配置
-
-Release版本使用以下签名配置（通过GitHub Secrets管理）：
-- Keystore文件: `release.keystore`
-- 密钥别名: `LuminCore`
-- 启用V1-V4签名
-
-## 环境要求
-
-- JDK 11
-- Android SDK 35
-- Gradle 8.0+
-
-## 快速开始
-
-1. 克隆项目
-2. 配置签名信息到GitHub Secrets
-3. Push到main分支触发自动构建
-4. 在GitHub Releases页面下载APK
-
-## 构建产物
-
-- **Debug APK**: `app/build/outputs/apk/debug/`
-- **Release APK**: `app/build/outputs/apk/release/`
-- **GitHub Release**: 自动创建并上传APK
-
-## 📲 APP上架计划
-
-LuminCore计划在2028年国庆节前完成全平台上架，目前正在进行相关准备工作：
-
-### 国内应用商店
-- **华为应用市场**：预计2028年8月上架
-- **小米应用商店**：预计2028年8月上架
-- **OPPO软件商店**：预计2028年9月上架
-- **vivo应用商店**：预计2028年9月上架
-- **应用宝**：预计2028年9月上架
-- **百度手机助手**：预计2028年9月上架
-
-### 国际应用商店
-- **Google Play**：预计2028年8月上架
-- **三星Galaxy Store**：预计2028年9月上架
-
-### 上架准备工作
-- **应用商店素材准备**：应用图标、截图、宣传图、描述文案等
-- **应用商店政策合规**：确保应用符合各应用商店的政策要求
-- **隐私政策完善**：根据各应用商店要求完善隐私政策
-- **用户协议制定**：制定符合法律法规的用户协议
-- **应用内容分级**：完成应用内容分级评估
-
-## 🔮 开发计划与路线图
-
-### 20208年第一季度
-- **核心功能开发**
-  - 完成基础月经周期追踪功能
-  - 实现日历视图和基本数据记录
-  - 开发本地数据库存储系统
-  - 构建MVVM架构基础框架
-
-### 2028年第二季度
-- **功能扩展与优化**
-  - 添加体重和基础体温记录功能
-  - 开发症状记录与分析系统
-  - 优化数据可视化图表
-  - 实现智能周期预测算法
-  - 增加多语言支持（中文、英文、日文）
-
-### 2028年第三季度
-- **高级功能开发**
-  - 集成健康建议和科普文章系统
-  - 开发多用户切换功能
-  - 添加健康日记功能
-  - 实现数据备份与恢复系统
-  - 开发应用锁与隐私保护功能
-  - **云端同步系统开发**
-    - 构建安全的云端数据存储架构
-    - 实现端到端加密数据传输
-    - 开发可选择性同步机制
-    - 设计多设备数据合并和冲突解决方案
-
-### 2028年第四季度
-- **平台扩展与上架准备**
-  - 开发iOS版本
-  - 构建Web端访问界面
-  - 完善云端同步生态系统
-    - 开发数据分析和导出工具
-    - 增强数据安全和隐私保护措施
-  - 应用商店上架准备
-    - 准备应用商店素材
-    - 完善隐私政策和用户协议
-    - 进行应用内容分级评估
-    - 对接各应用商店支付系统（如需）
-
-### 2027年展望
-- **生态系统扩展**
-  - 开发可穿戴设备集成功能
-  - 添加AI驱动的健康分析系统
-  - 构建开发者API和插件系统
-  - 探索与其他健康应用的数据互通
-  - 研发高级数据可视化和预测模型
-
-### 技术研发重点
-- **性能优化**
-  - 优化应用启动时间和响应速度
-  - 减少内存占用和电池消耗
-  - 实现高效的数据处理算法
-- **用户体验提升**
-  - 进行用户研究和可用性测试
-  - 优化UI/UX设计
-  - 实现流畅的动画和交互效果
-- **安全与隐私**
-  - 实施高级数据加密方案
-  - 开发匿名化数据分析系统
-  - 遵循全球隐私法规标准
 
 ## 🤝 参与贡献
 
@@ -467,6 +339,4 @@ LuminCore计划在2028年国庆节前完成全平台上架，目前正在进行�
 
 本软件已申请软件著作权保护。允许个人用户出于非商业目的使用、查看和学习本软件的源代码。未经版权所有者明确书面许可，禁止将本软件用于任何商业目的，禁止重新分发本软件的原始或修改版本，禁止基于本软件创建衍生作品。
 
-详细许可条款请参阅项目根目录中的LICENSE文件。
-
----
+详细许可条款请参阅项目根目录中的 LICENSE 文件。
