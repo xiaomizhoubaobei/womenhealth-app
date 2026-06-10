@@ -104,6 +104,131 @@ LuminCore 是一款注重隐私保护的女性健康管理工具，采用纯本�
 
 应用内置**贴心避孕**和**黄金备孕**双模式，根据不同使用场景提供针对性的健康建议和预测分析。
 
+## 📊 项目流程图
+
+### 技术架构流程图
+
+```mermaid
+graph TB
+    subgraph UI层["🎨 UI 层 (Jetpack Compose)"]
+        MainActivity[MainActivity]
+        ComposeUI[Compose 组件树]
+        Theme[Material3 主题]
+        Canvas[Canvas 自绘图表]
+    end
+
+    subgraph ViewModel层["📦 ViewModel 层"]
+        PeriodVM[PeriodViewModel]
+        StateFlow[StateFlow 状态管理]
+    end
+
+    subgraph Data层["💾 数据层"]
+        Repository[PeriodRepository]
+        RoomDB[(Room 数据库)]
+        GeminiAPI[Gemini AI API]
+        Retrofit[Retrofit + OkHttp]
+    end
+
+    subgraph 功能模块["🔧 功能模块"]
+        Calendar[生理周期日历]
+        CycleWheel[周期环形指示器]
+        Prediction[经期预测]
+        AIAnalysis[AI 健康分析]
+        HealthTrack[健康生活追踪]
+        BBT[基础体温追踪]
+    end
+
+    MainActivity --> ComposeUI
+    ComposeUI --> Theme
+    ComposeUI --> Canvas
+    ComposeUI --> PeriodVM
+    PeriodVM --> StateFlow
+    PeriodVM --> Repository
+    Repository --> RoomDB
+    Repository --> GeminiAPI
+    GeminiAPI --> Retrofit
+
+    PeriodVM --> Calendar
+    PeriodVM --> CycleWheel
+    PeriodVM --> Prediction
+    PeriodVM --> AIAnalysis
+    PeriodVM --> HealthTrack
+    PeriodVM --> BBT
+
+    style UI层 fill:#E3F2FD,stroke:#1565C0,stroke-width:2px
+    style ViewModel层 fill:#FFF3E0,stroke:#E65100,stroke-width:2px
+    style Data层 fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px
+    style 功能模块 fill:#FCE4EC,stroke:#C62828,stroke-width:2px
+```
+
+### 核心功能流程图
+
+```mermaid
+graph LR
+    subgraph 记录模块["📝 记录模块"]
+        A[记录经期] --> B[记录症状]
+        B --> C[记录情绪]
+        C --> D[添加备注]
+    end
+
+    subgraph 分析模块["📊 分析模块"]
+        E[周期计算] --> F[阶段识别]
+        F --> G[规律度评分]
+        G --> H[趋势分析]
+    end
+
+    subgraph 预测模块["🔮 预测模块"]
+        I[经期预测] --> J[排卵预测]
+        J --> K[易孕期计算]
+        K --> L[未来三月预测]
+    end
+
+    subgraph AI模块["🤖 AI 模块"]
+        M[数据匿名化] --> N[Gemini API]
+        N --> O[健康报告]
+        N --> P[在线咨询]
+    end
+
+    记录模块 --> 分析模块
+    分析模块 --> 预测模块
+    分析模块 --> AI模块
+
+    style 记录模块 fill:#E8EAF6,stroke:#283593,stroke-width:2px
+    style 分析模块 fill:#FFF8E1,stroke:#F57F17,stroke-width:2px
+    style 预测模块 fill:#F3E5F5,stroke:#6A1B9A,stroke-width:2px
+    style AI模块 fill:#E0F2F1,stroke:#00695C,stroke-width:2px
+```
+
+### 数据流向图
+
+```mermaid
+flowchart TD
+    User([👤 用户]) --> |输入数据| UI[UI 组件]
+    UI --> |用户事件| VM[ViewModel]
+    VM --> |状态更新| UI
+    VM --> |数据操作| Repo[Repository]
+
+    Repo --> |CRUD 操作| DB[(本地数据库)]
+    DB --> |查询结果| Repo
+
+    Repo --> |API 请求| API[Gemini API]
+    API --> |AI 响应| Repo
+
+    Repo --> |数据流| VM
+    VM --> |StateFlow| UI
+    UI --> |渲染| User
+
+    subgraph 安全层["🔒 隐私保护"]
+        LocalStore[本地存储]
+        Anonymize[数据匿名化]
+    end
+
+    DB -.-> LocalStore
+    API -.-> Anonymize
+
+    style 安全层 fill:#FFEBEE,stroke:#C62828,stroke-width:2px,stroke-dasharray: 5 5
+```
+
 ## ✨ 已实现功能
 
 ### 核心追踪
